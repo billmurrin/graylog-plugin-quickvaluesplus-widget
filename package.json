@@ -4,7 +4,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/billmurrin/graylog-plugin-quick-values-plus-widget"
+    "url": "https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget"
   },
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server",
