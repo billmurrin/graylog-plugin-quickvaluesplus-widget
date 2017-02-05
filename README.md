@@ -1,6 +1,6 @@
 # QuickValuesPlus Widget Plugin for Graylog2
 
-[![Build Status](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quick-values-plus-widget.svg?branch=master)](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quick-values-plus-widget)
+[![Build Status](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget.svg?branch=master)](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget)
 
 The QuickValuesPlus Widget is a fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
 
@@ -49,8 +49,7 @@ If you run into issues with the current snapshot you can clone the 2.1.3 version
      "reflux": "^0.2.12",
      "crossfilter": "1.3.x",
      "d3": "<=3.5.0",
-     "dc": "2.0.0-beta.19",
-     "deep-equal": "^1.0.1",
+     "dc": "2.0.0-beta.19",     "deep-equal": "^1.0.1",
      "immutable": "^3.7.5"
    },
    "devDependencies": {
