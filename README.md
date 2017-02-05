@@ -42,14 +42,15 @@ If you run into issues with the current snapshot you can clone the 2.1.3 version
 
 `git clone -b "2.1.3" https://github.com/Graylog2/graylog2-server.git`
 
-**TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)"
+**TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)". The example below has a few additional packages (crossfilter, d3, dc, deep-equal and immutable).
 
 ```
 "dependencies": {
      "reflux": "^0.2.12",
      "crossfilter": "1.3.x",
      "d3": "<=3.5.0",
-     "dc": "2.0.0-beta.19",     "deep-equal": "^1.0.1",
+     "dc": "2.0.0-beta.19",
+     "deep-equal": "^1.0.1",
      "immutable": "^3.7.5"
    },
    "devDependencies": {
