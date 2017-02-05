@@ -1,27 +1,33 @@
-sudo: required
-dist: trusty
-language: java
-jdk:
-  - oraclejdk8
-addons:
-  apt:
-    packages:
-      - rpm
-before_deploy:
-  - mvn jdeb:jdeb && export RELEASE_DEB_FILE=$(ls target/*.deb)
-  - mvn rpm:rpm && export RELEASE_RPM_FILE=$(find target/ -name '*.rpm' | tail -1)
-  - rm -f target/original-*.jar
-  - export RELEASE_PKG_FILE=$(ls target/*.jar)
-  - echo "Deploying release to GitHub releases"
-deploy:
-  provider: releases
-  api_key:
-    secure: "j6WO3LAE4vNRoARS4kBXnmmnE9FSrQNCj+FwNpBz/bGytDIeNhFhAxpmRVso5Ahd0E7jTpDzmRn/5Kk2XOtJg8wy1GkZaag4TOijzB6PX4TaOzaPWX7BHgS1Oh4gFi+BN0Gt+mgITPkONyPN4LFG2GY0DmUCF8R7sq8OqUEHmDmDLbiLIzhJI3iuAs5Rju/xOQGAVpt8bgxGkvt0rrI9zx60zlDH687m8etQWk+4E5zBaisithSKhrYZPc7HwUuSuvfkaG8PaYFVNlEM9Y7HCfRKqogySg2WWNlyCcFdaUlwkOEwbzhx6/DcyZUROFrgzieQvQavYxIp9uVOKkJviFdrQ9unnPIkaBjoYJgaEvAvkBjIE7k7WtxB1qRqRuE7/t8CYGEdxu0TX1Bik4NmfSDN+xjSBKMnaKPpciPJIVuIj+vlm+c1pdWJFNXCqajn1a4Gm3rV5DNWfko9jItThYSx/OiQWyKlC4rPYWoV6UCWkofQy+bpnj3+xOF9RsuHTRR/rOsSiCYmOjypPaApp9qXFZVH3Yc0NtuBevC5osBk+DJLznclW3soJMBEd4aGgBeD9EfCXRSpTLxQfPjVyCgiClp9yRMAcBw8NPCJ5xItwfVzvt8ZuRPTNNBwcF32N6FO5UiusZlOsZQu5gfJLJvdLWEKTbf5rp0xHEHEPQI="
-  file:
-    - "${RELEASE_PKG_FILE}"
-    - "${RELEASE_DEB_FILE}"
-    - "${RELEASE_RPM_FILE}"
-  skip_cleanup: true
-  on:
-    tags: true
-    jdk: oraclejdk8
+    sudo: required
+    dist: trusty
+    language: java
+    jdk:
+    - oraclejdk8
+    install:
+      - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dskip.web.build=true -B -V
+    script:
+      - mvn test -Dskip.web.build=true -B
+    addons:
+      apt:
+        packages:
+        - rpm
+    before_deploy:
+    - mvn jdeb:jdeb && export RELEASE_DEB_FILE=$(ls target/*.deb)
+    - mvn rpm:rpm && export RELEASE_RPM_FILE=$(find target/ -name '*.rpm' | tail -1)
+    - rm -f target/original-*.jar
+    - export RELEASE_PKG_FILE=$(ls target/*.jar)
+    - echo "Deploying release to GitHub releases"
+    deploy:
+      provider: releases
+      api_key:
+        secure: j6WO3LAE4vNRoARS4kBXnmmnE9FSrQNCj+FwNpBz/bGytDIeNhFhAxpmRVso5Ahd0E7jTpDzmRn/5Kk2XOtJg8wy1GkZaag4TOijzB6PX4TaOzaPWX7BHgS1Oh4gFi+BN0Gt+mgITPkONyPN4LFG2GY0DmUCF8R7sq8OqUEHmDmDLbiLIzhJI3iuAs5Rju/xOQGAVpt8bgxGkvt0rrI9zx60zlDH687m8etQWk+4E5zBaisithSKhrYZPc7HwUuSuvfkaG8PaYFVNlEM9Y7HCfRKqogySg2WWNlyCcFdaUlwkOEwbzhx6/DcyZUROFrgzieQvQavYxIp9uVOKkJviFdrQ9unnPIkaBjoYJgaEvAvkBjIE7k7WtxB1qRqRuE7/t8CYGEdxu0TX1Bik4NmfSDN+xjSBKMnaKPpciPJIVuIj+vlm+c1pdWJFNXCqajn1a4Gm3rV5DNWfko9jItThYSx/OiQWyKlC4rPYWoV6UCWkofQy+bpnj3+xOF9RsuHTRR/rOsSiCYmOjypPaApp9qXFZVH3Yc0NtuBevC5osBk+DJLznclW3soJMBEd4aGgBeD9EfCXRSpTLxQfPjVyCgiClp9yRMAcBw8NPCJ5xItwfVzvt8ZuRPTNNBwcF32N6FO5UiusZlOsZQu5gfJLJvdLWEKTbf5rp0xHEHEPQI=
+      file_glob: true
+      file:
+        - "**/target/*.jar"
+        - "**/target/*.deb"
+        - "**/target/**/*.rpm"
+      skip_cleanup: true
+      on:
+        repo: billmurrin/graylog-plugin-quickvaluesplus-widget
+        tags: true
+        jdk: oraclejdk8
