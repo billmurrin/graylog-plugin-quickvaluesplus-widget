@@ -50,7 +50,6 @@ const QuickValuesPlusVisualization = React.createClass({
         } else {
             this.sortOrder = d3.ascending;
         }
-        console.log("DIDMOUNT: This sort order is " + this.sortOrder);
         this.tableChanged = false;
         this.tableSize =  this.props.config.table_size;
         this.topValues = this.props.config.top_values;
@@ -60,11 +59,10 @@ const QuickValuesPlusVisualization = React.createClass({
         this._renderPieChart();
     },
     componentWillReceiveProps(nextProps) {
-        console.log("Will Receive Propes");
         if (deepEqual(this.props, nextProps)) {
             return;
         }
-        console.log(this.props);
+
         if (nextProps.config.sort_order === "descending") {
             this.sortOrder = d3.descending;
             this.props.config.sort_order = "descending";
@@ -72,9 +70,7 @@ const QuickValuesPlusVisualization = React.createClass({
             this.sortOrder = d3.ascending;
             this.props.config.sort_order = "ascending";
         }
-        console.log(nextProps);
 
-        console.log("UPDATE: The sort order is " + this.sortOrder + ", config sort order: " + this.props.config.sort_order);
         this.tableChanged = true;
         this.tableSize =  nextProps.config.table_size;
         this.topValues = nextProps.config.top_values;

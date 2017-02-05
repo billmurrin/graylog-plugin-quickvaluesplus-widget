@@ -260,20 +260,13 @@ public class Searches {
             size = 50;
         }
 
-        LOG.info("The size of the terms array is " + size);
-        LOG.info("The sortSearchOrder is " + sortSearchOrder);
-
         if (sortSearchOrder.equals("descending")){
-            LOG.info("Order: " + sortSearchOrder + ", Setting order to true.");
             termsOrder = Terms.Order.count(false);
         }
         else
         {
-            LOG.info("Order: " + sortSearchOrder + ", Setting order to false.");
             termsOrder = Terms.Order.count(true);
         }
-
-        LOG.info("Sort order is " + termsOrder.toString() + ". The requested sort was " + sortSearchOrder);
 
         SearchRequestBuilder srb;
         if (filter == null) {
@@ -294,8 +287,6 @@ public class Searches {
                 .filter(standardAggregationFilters(range, filter));
 
         srb.addAggregation(builder);
-
-        LOG.info("SRB is " + srb.toString());
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
