@@ -18,7 +18,6 @@ The JAR was tested in GrayLog 2.1.3, but should hopefully work in others. Please
 Way Ahead (Next Version)
 -----------
  * Add customize menu to widget when attached to a stream which allows ability to toggle sort order, top values and table size.
- *  
 
 Installation
 ------------
