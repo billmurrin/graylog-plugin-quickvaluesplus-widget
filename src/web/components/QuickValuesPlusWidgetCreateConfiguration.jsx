@@ -38,22 +38,22 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                onChange={this.props.onChange}
                help="Modify the number of results in the table."/>
 
-        <div className="radio">
-          <label>
-            <input key="dataSortOrderDesc"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
-                   onChange={this.props.onChange}
-                   defaultChecked={this.props.config.sort_order === 'descending'}/>
-            Descending
-          </label>
-        </div>
-        <div className="radio">
-          <label>
-            <input key="dataSortOrderAsc" id="quickvaluesplus-sort-order-ascending" type="radio" name="sort_order" value="ascending"
-                   onChange={this.props.onChange}
-                   defaultChecked={this.props.config.sort_order === 'ascending'}/>
-            Ascending
-          </label>
-        </div>
+          <div className="radio">
+              <label>
+                  <input key="dataSortOrder"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
+                         onChange={this.props.onChange}
+                         defaultChecked='true'/>
+                  Descending
+              </label>
+          </div>
+          <div className="radio">
+              <label>
+                  <input key="dataSortOrder" id="quickvaluesplus-sort-order-ascending" type="radio" name="sort_order" value="ascending"
+                         onChange={this.props.onChange}
+                         defaultChecked='false'/>
+                  Ascending
+              </label>
+          </div>
 
         <Input key="showPieChart"
                type="checkbox"

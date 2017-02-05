@@ -75,6 +75,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.COUNT;
 import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.REVERSE_COUNT;
+import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.REVERSE_MAX;
 
 @Singleton
 public class Searches {
@@ -221,6 +222,7 @@ public class Searches {
     }
 
     public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) {
+        LOG.info("The sorting order is " + sorting);
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query(query)
                 .filter(filter)
@@ -251,62 +253,27 @@ public class Searches {
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, String sort) {
-        TermsStatsOrder order;
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, String sortSearchOrder) {
+        Terms.Order termsOrder;
 
         if (size == 0) {
             size = 50;
         }
 
-        if (sort == "descending"){
-            order = COUNT;
+        LOG.info("The size of the terms array is " + size);
+        LOG.info("The sortSearchOrder is " + sortSearchOrder);
+
+        if (sortSearchOrder.equals("descending")){
+            LOG.info("Order: " + sortSearchOrder + ", Setting order to true.");
+            termsOrder = Terms.Order.count(false);
         }
         else
         {
-            order = REVERSE_COUNT;
+            LOG.info("Order: " + sortSearchOrder + ", Setting order to false.");
+            termsOrder = Terms.Order.count(true);
         }
 
-        Terms.Order termsOrder;
-        switch (order) {
-            case COUNT:
-                termsOrder = Terms.Order.count(true);
-                break;
-            case REVERSE_COUNT:
-                termsOrder = Terms.Order.count(false);
-                break;
-            case TERM:
-                termsOrder = Terms.Order.term(true);
-                break;
-            case REVERSE_TERM:
-                termsOrder = Terms.Order.term(false);
-                break;
-            case MIN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "min", true);
-                break;
-            case REVERSE_MIN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "min", false);
-                break;
-            case MAX:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "max", true);
-                break;
-            case REVERSE_MAX:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "max", false);
-                break;
-            case MEAN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "avg", true);
-                break;
-            case REVERSE_MEAN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "avg", false);
-                break;
-            case TOTAL:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "sum", true);
-                break;
-            case REVERSE_TOTAL:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "sum", false);
-                break;
-            default:
-                termsOrder = Terms.Order.count(true);
-        }
+        LOG.info("Sort order is " + termsOrder.toString() + ". The requested sort was " + sortSearchOrder);
 
         SearchRequestBuilder srb;
         if (filter == null) {
@@ -328,11 +295,14 @@ public class Searches {
 
         srb.addAggregation(builder);
 
+        LOG.info("SRB is " + srb.toString());
+
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
         recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
+
         return new TermsResult(
                 f.getAggregations().get(AGG_TERMS),
                 f.getAggregations().get("missing"),

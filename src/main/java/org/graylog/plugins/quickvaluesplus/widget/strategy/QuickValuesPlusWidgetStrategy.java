@@ -25,6 +25,8 @@ import org.graylog.plugins.quickvaluesplus.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -32,6 +34,7 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(QuickValuesPlusWidgetStrategy.class);
 
     public interface Factory extends WidgetStrategy.Factory<QuickValuesPlusWidgetStrategy> {
         @Override
@@ -42,7 +45,7 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
     @Nullable
     private final String streamId;
     private Integer tableSize;
-    private String sort;
+    private String sortOrder;
     private final String field;
     private final Searches searches;
     private final TimeRange timeRange;
@@ -57,7 +60,9 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
         }
 
         this.query = (String)config.get("query");
-        this.sort = (String)config.get("sort_order").toString();
+        this.sortOrder = (String)config.get("sort_order").toString();
+
+        LOG.info("The request Sort is going to be " + this.sortOrder);
         this.field = (String) config.get("field");
         this.streamId = (String) config.get("stream_id");
         this.tableSize = Integer.parseInt(config.get("table_size").toString());
@@ -70,10 +75,8 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
             filter = "streams:" + streamId;
         }
 
-        if (!isNullOrEmpty(this.sort)) {
-            this.sort = (String) "COUNT";
-        }
-        final TermsResult terms = searches.terms(field, this.tableSize, query, filter, this.timeRange, this.sort);
+        LOG.info("The sort going in is " + this.sortOrder);
+        final TermsResult terms = searches.terms(field, this.tableSize, query, filter, this.timeRange, this.sortOrder);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("terms", terms.getTerms());

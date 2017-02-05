@@ -32,7 +32,7 @@ const QuickValuesPlusWidgetEditConfiguration = React.createClass({
 
               <div className="radio">
                   <label>
-                      <input key="dataSortOrderDesc"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
+                      <input key="dataSortOrder"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
                              onChange={this.props.onChange}
                              defaultChecked={this.props.config.sort_order === 'descending'}/>
                       Descending
@@ -40,7 +40,7 @@ const QuickValuesPlusWidgetEditConfiguration = React.createClass({
               </div>
               <div className="radio">
                   <label>
-                      <input key="dataSortOrderAsc" id="quickvaluesplus-sort-order-ascending" type="radio" name="sort_order" value="ascending"
+                      <input key="dataSortOrder" id="quickvaluesplus-sort-order-ascending" type="radio" name="sort_order" value="ascending"
                              onChange={this.props.onChange}
                              defaultChecked={this.props.config.sort_order === 'ascending'}/>
                       Ascending
