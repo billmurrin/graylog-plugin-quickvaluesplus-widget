@@ -13,9 +13,6 @@ import NumberUtils from 'util/NumberUtils';
 import StoreProvider from 'injection/StoreProvider';
 const SearchStore = StoreProvider.getStore('Search');
 
-//require('!script!../../public/javascripts/jquery-2.1.1.min.js');
-//require('!script!../../public/javascripts/bootstrap.min.js');
-
 const QuickValuesPlusVisualization = React.createClass({
     propTypes: {
         id: PropTypes.string,
@@ -76,7 +73,6 @@ const QuickValuesPlusVisualization = React.createClass({
         this.topValues = nextProps.config.top_values;
         this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
         this._formatProps(nextProps);
-
         this._renderDataTable();
         this._renderPieChart();
     },
@@ -101,7 +97,7 @@ const QuickValuesPlusVisualization = React.createClass({
                 });
             });
             this.shouldUpdateData = (this.tableChanged) ? true : !formattedTerms.equals(this.state.terms);
-            this.tableChanged = true;
+            this.tableChanged = false;
             this.setState({
                 total: quickValues.total,
                 others: quickValues.other,
@@ -166,7 +162,6 @@ const QuickValuesPlusVisualization = React.createClass({
         this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
         if (this.sortOrder == d3.descending){
             const descGroup = this._getTop(this.group);
-            console.log(descGroup);//
             this.dataTable
                 .dimension(this.dimension)
                 .size(this.tableSize)
@@ -200,7 +195,7 @@ const QuickValuesPlusVisualization = React.createClass({
                 .sortBy((d) => d.count)
                 .order(d3.ascending)
                 .group((ascGroup) => {
-                    const bottomValues = this.group.top(Infinity).slice(-this.topValues).reverse()
+                    const bottomValues = this.group.top(Infinity).slice(-this.topValues).reverse();
                     const dInBottomValues = bottomValues.some((value) => ascGroup.term.localeCompare(value.key) === 0);
                     return dInBottomValues ? 'Bottom values' : 'Others';
                 })
