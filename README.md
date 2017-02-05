@@ -1,6 +1,6 @@
 # QuickValuesPlus Widget Plugin for Graylog2
 
-[![Build Status](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget.svg?branch=master)](https://travis-ci.org/https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget)
+[![Build Status](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget.svg?branch=master)](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget)
 
 The QuickValuesPlus Widget is a fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
 
