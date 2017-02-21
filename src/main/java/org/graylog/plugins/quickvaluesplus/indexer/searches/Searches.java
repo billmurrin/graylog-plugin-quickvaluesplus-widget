@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog.plugins.quickvaluesplus.indexer.searches;
+
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Sets;
+
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
@@ -39,8 +44,10 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.CountResult;
@@ -54,28 +61,37 @@ import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
+import joptsimple.internal.Strings;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.COUNT;
-import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.REVERSE_COUNT;
-import static org.graylog.plugins.quickvaluesplus.indexer.searches.Searches.TermsStatsOrder.REVERSE_MAX;
 
 @Singleton
 public class Searches {
@@ -89,6 +105,7 @@ public class Searches {
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
     public static final String AGG_VALUE_COUNT = "gl2_value_count";
+    private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
 
     public enum TermsStatsOrder {
         TERM,
@@ -146,25 +163,28 @@ public class Searches {
 
 
     private final Configuration configuration;
-    private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final Client c;
     private final Timer esRequestTimer;
     private final Histogram esTimeRangeHistogram;
+    private final StreamService streamService;
+    private final Indices indices;
 
     @Inject
     public Searches(Configuration configuration,
-                    Deflector deflector,
                     IndexRangeService indexRangeService,
                     Client client,
-                    MetricRegistry metricRegistry) {
+                    MetricRegistry metricRegistry,
+                    StreamService streamService,
+                    Indices indices) {
         this.configuration = checkNotNull(configuration);
-        this.deflector = checkNotNull(deflector);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.c = checkNotNull(client);
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
+        this.streamService = streamService;
+        this.indices = indices;
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -172,7 +192,7 @@ public class Searches {
     }
 
     public CountResult count(String query, TimeRange range, String filter) {
-        Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        Set<String> indices = determineAffectedIndices(range, filter);
 
         final SearchRequestBuilder srb;
         if (filter == null) {
@@ -188,7 +208,7 @@ public class Searches {
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
-        final Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        final Set<String> indices = determineAffectedIndices(range, filter);
 
         // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
         // until we've scrolled through the entire set.
@@ -222,7 +242,6 @@ public class Searches {
     }
 
     public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) {
-        LOG.info("The sorting order is " + sorting);
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query(query)
                 .filter(filter)
@@ -236,9 +255,7 @@ public class Searches {
     }
 
     public SearchResult search(SearchesConfig config) {
-        Set<IndexRange> indices = IndexHelper.determineAffectedIndicesWithRanges(indexRangeService,
-                deflector,
-                config.range());
+        Set<IndexRange> indices = determineAffectedIndicesWithRanges(config.range(), config.filter());
 
         Set<String> indexNames = Sets.newHashSet();
         for (IndexRange index : indices) {
@@ -270,9 +287,9 @@ public class Searches {
 
         SearchRequestBuilder srb;
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = standardSearchRequest(query, determineAffectedIndices(range, null), range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = filteredSearchRequest(query, filter, determineAffectedIndices(range, filter), range);
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
@@ -293,7 +310,6 @@ public class Searches {
         recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
-
         return new TermsResult(
                 f.getAggregations().get(AGG_TERMS),
                 f.getAggregations().get("missing"),
@@ -309,16 +325,18 @@ public class Searches {
     }
 
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
+
         if (size == 0) {
             size = 50;
         }
 
         SearchRequestBuilder srb;
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = standardSearchRequest(query, determineAffectedIndices(range, filter), range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = filteredSearchRequest(query, filter, determineAffectedIndices(range, filter), range);
         }
+
 
         Terms.Order termsOrder;
         switch (order) {
@@ -409,10 +427,12 @@ public class Searches {
             throws FieldTypeException {
         SearchRequestBuilder srb;
 
+        final Set<String> indices = indicesContainingField(determineAffectedIndices(range, filter), field);
+
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = standardSearchRequest(query, indices, range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
+            srb = filteredSearchRequest(query, filter, indices, range);
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
@@ -437,6 +457,8 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
+        checkForFailedShards(r);
+
         recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
@@ -449,6 +471,30 @@ public class Searches {
                 request.source(),
                 r.getTook()
         );
+    }
+
+    private Set<String> indicesContainingField(Set<String> strings, String field) {
+        return indices.getAllMessageFieldsForIndices(strings.toArray(new String[strings.size()]))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().contains(field))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    private void checkForFailedShards(SearchResponse r) throws FieldTypeException {
+        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
+        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
+        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
+        // otherwise we would be showing empty graphs for non-numeric fields.
+        if (r.getFailedShards() > 0) {
+            final Optional<ShardSearchFailure> failure = Arrays.stream(r.getShardFailures())
+                    .filter(shardSearchFailure -> shardSearchFailure.getCause() instanceof IllegalArgumentException)
+                    .findFirst();
+            if (failure.isPresent()) {
+                throw new FieldTypeException(failure.get().getCause());
+            }
+        }
     }
 
     private SearchRequestBuilder searchRequest(SearchesConfig config, Set<String> indices) {
@@ -589,4 +635,79 @@ public class Searches {
             super(e);
         }
     }
+
+
+    /**
+     * Extracts the last stream id from the filter string passed as part of the elasticsearch query. This is used later
+     * to pass to possibly existing message decorators for stream-specific configurations.
+     *
+     * The assumption is that usually (when listing/searching messages for a stream) only a single stream filter is passed.
+     * When this is not the case, only the last stream id will be taked into account.
+     *
+     * This is currently a workaround. A better solution would be to pass the stream id which is supposed to be the scope
+     * for a search query as a separate parameter.
+     *
+     * @param filter the filter string like "streams:xxxyyyzzz"
+     * @return the optional stream id
+     */
+    public static Optional<String> extractStreamId(String filter) {
+        if (Strings.isNullOrEmpty(filter)) {
+            return Optional.empty();
+        }
+        final Matcher streamIdMatcher = filterStreamIdPattern.matcher(filter);
+        if (streamIdMatcher.find()) {
+            return Optional.of(streamIdMatcher.group(2));
+        }
+        return Optional.empty();
+    }
+
+    public Set<String> determineAffectedIndices(TimeRange range,
+                                                @Nullable String filter) {
+        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(range, filter);
+        return indexRanges.stream()
+                .map(IndexRange::indexName)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<IndexRange> determineAffectedIndicesWithRanges(TimeRange range,
+                                                              @Nullable String filter) {
+        final Optional<String> streamId = extractStreamId(filter);
+        IndexSet indexSet = null;
+        // if we are searching in a stream, we are further restricting the indices using the currently
+        // configure index set of that stream.
+        // later on we will also test against each index range (we load all of them) to see if there are
+        // additional index ranges that match, this can happen with restored archives or when the index set for
+        // a stream has changed: a stream only knows about its currently configured index set, no the history
+        if (streamId.isPresent()) {
+            try {
+                final Stream stream = streamService.load(streamId.get());
+                indexSet = stream.getIndexSet();
+            } catch (NotFoundException ignored) {
+            }
+        }
+
+        final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
+        final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
+        for (IndexRange indexRange : indexRanges) {
+            // if we aren't in a stream search, we look at all the ranges matching the time range.
+            if (indexSet == null && filter == null) {
+                indices.add(indexRange);
+                continue;
+            }
+
+            // A range applies to this search if either: the current index set of the stream matches or a previous index set matched.
+            final boolean streamInIndexRange = streamId.isPresent() && indexRange.streamIds() != null && indexRange.streamIds().contains(streamId.get());
+            final boolean streamInCurrentIndexSet = indexSet != null && indexSet.isManagedIndex(indexRange.indexName());
+
+            if (streamInIndexRange) {
+                indices.add(indexRange);
+            }
+            if (streamInCurrentIndexSet) {
+                indices.add(indexRange);
+            }
+        }
+
+        return indices.build();
+    }
+
 }

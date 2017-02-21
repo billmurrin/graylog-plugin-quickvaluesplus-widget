@@ -8,7 +8,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-quickvaluesplus-widget</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -37,7 +37,7 @@
         <!-- Plugins will not be deployed by default - set to `false` if you actually want to deploy it -->
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <graylog.version>2.1.1</graylog.version>
+        <graylog.version>2.2.1</graylog.version>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
     </properties>
 
