@@ -4,16 +4,23 @@
 
 The QuickValuesPlus Widget is a fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
 
-When the QuickValuesPlus Widget is added to a stream as a field analyzer it adds a "Remove from search" column. The button will negate the field in the search bar (E.g. !field_name:foo).
+When the QuickValuesPlus Widget is added to a stream as a field analyzer it adds a "Remove from search" button. The button will negate the field in the search bar (E.g. !field_name:foo).
 
-In addition, the QuickValuesPlus Widget has extra features when added to a dashboard such as:
+![alt text](https://www.dropbox.com/s/a4ooar8u7j6bqd2/remove_from_search_button.PNG?dl=0 "Remove From Search Button")
+
+In addition, the QuickValuesPlus Widget has extra features when added to dashboards, such as:
  * Support for **ascending** OR **descending** sort order in the datatable. Can now obtain true bottom values.
  * Editable number of Top/Bottom values (Quick Values default is 5). This is the one with a color in the table.
  * Customizable table size (Quick values default is 50).
   
-**Required Graylog version:** 2.0 and later
+![alt text](https://www.dropbox.com/s/rwkqconcez262mg/Configuration%20Options.PNG?dl=0 "Example of Configuration Options")
 
-The JAR was tested in GrayLog 2.1.3, but should hopefully work in others. Please file a bug report if not.
+**Required Graylog version:** 2.2 and later
+
+Version 1.0.0 was tested and is compatible with Graylog version 2.1.3
+Version 2.0.0 was tested and is compatible with Graylog version 2.2.1
+ 
+Please file a bug report providing as much detail as possible if you find that the plugin is not working.
 
 Way Ahead (Next Version)
 -----------
@@ -38,34 +45,40 @@ dramatically by making use of hot reloading. To do this, do the following:
 * `ln -s $YOURPLUGIN plugin/`
 * `npm install && npm start`
 
-If you run into issues with the current snapshot you can clone the 2.1.3 version of Graylog by using the following:
+If you run into issues with the current snapshot you can clone the 2.2.1 version of Graylog by using the following:
 
-`git clone -b "2.1.3" https://github.com/Graylog2/graylog2-server.git`
+`git clone -b "2.2.1" https://github.com/Graylog2/graylog2-server.git`
 
 **TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)". The example below has a few additional packages (crossfilter, d3, dc, deep-equal and immutable).
 
 ```
-"dependencies": {
-     "reflux": "^0.2.12",
-     "crossfilter": "1.3.x",
-     "d3": "<=3.5.0",
-     "dc": "2.0.0-beta.19",
-     "deep-equal": "^1.0.1",
-     "immutable": "^3.7.5"
-   },
-   "devDependencies": {
-     "babel-core": "^5.x.x",
-     "babel-loader": "^5.x.x",
-     "graylog-web-manifests": "^2.0.0-SNAPSHOT-1",
-     "graylog-web-plugin": "~0.0.17",
-     "json-loader": "^0.5.4",
-     "react": "^0.14.6",
-     "react-bootstrap": "^0.28.2",
-     "react-dom": "^0.14.6",
-     "react-hot-loader": "^1.3.0",
-     "react-proxy-loader": "^0.3.4",
-     "webpack": "^1.12.2"
-   }
+ "dependencies": {
+    "reflux": "^0.2.12",
+    "crossfilter": "1.3.x",
+    "d3": "<=3.5.0",
+    "dc": "2.0.0-beta.19",
+    "deep-equal": "^1.0.1",
+    "immutable": "^3.7.5"
+  },
+  "devDependencies": {
+    "babel-core": "^6.0.0",
+    "babel-loader": "^6.0.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-polyfill": "^6.0.0",
+    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-react": "^6.0.0",
+    "babel-preset-stage-0": "^6.0.0",
+    "clean-webpack-plugin": "^0.1.3",
+    "graylog-web-manifests": "^2.0.0-SNAPSHOT-1",
+    "graylog-web-plugin": "~0.0.21",
+    "json-loader": "^0.5.4",
+    "react": "^0.14.6",
+    "react-bootstrap": "^0.28.2",
+    "react-dom": "^0.14.6",
+    "react-hot-loader": "^3.0.0-beta.3",
+    "react-proxy-loader": "^0.3.4",
+    "webpack": "^1.12.2"
+  }
 ```
 
 Usage
