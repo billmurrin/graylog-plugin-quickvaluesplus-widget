@@ -15,10 +15,9 @@ In addition, the QuickValuesPlus Widget has extra features when added to dashboa
   
 ![alt text](http://i.imgur.com/7PLDXCW.png "Example of Configuration Options")
 
-**Required Graylog version:** 2.2 and later
-
-Version 1.0.0 was tested and is compatible with Graylog version 2.1.3
-Version 2.0.0 was tested and is compatible with Graylog version 2.2.1
+**Required Graylog versions:**
+* Version 1.0.0 was tested and is compatible with Graylog version 2.1.3
+* Version 2.0.0 was tested and is compatible with Graylog version 2.2.1
  
 Please file a bug report providing as much detail as possible if you find that the plugin is not working.
 
