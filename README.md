@@ -1,8 +1,9 @@
 # QuickValuesPlus Widget Plugin for Graylog2
-
+[![Github Downloads](https://img.shields.io/github/downloads/billmurrin/graylog-plugin-quickvaluesplus-widget/total.svg)](https://github.com/billmurrin/graylog-plugin-slookup-function/releases)
+[![GitHub Release](https://img.shields.io/github/release/billmurrin/graylog-plugin-quickvaluesplus-widget.svg)](https://github.com/billmurrin/graylog-plugin-slookup-function/releases)
 [![Build Status](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget.svg?branch=master)](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget)
 
-The QuickValuesPlus Widget is a fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
+The QuickValuesPlus Widget is an enhanced fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
 
 When the QuickValuesPlus Widget is added to a stream as a field analyzer it adds a "Remove from search" button. The button will negate the field in the search bar (E.g. !field_name:foo).
 
@@ -17,7 +18,7 @@ In addition, the QuickValuesPlus Widget has extra features when added to dashboa
 
 **Required Graylog versions:**
 * Version 1.0.0 was tested and is compatible with Graylog version 2.1.3
-* Version 2.0.0 was tested and is compatible with Graylog version 2.2.1
+* Version 2.0.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3
  
 Please file a bug report providing as much detail as possible if you find that the plugin is not working.
 
@@ -44,9 +45,9 @@ dramatically by making use of hot reloading. To do this, do the following:
 * `ln -s $YOURPLUGIN plugin/`
 * `npm install && npm start`
 
-If you run into issues with the current snapshot you can clone the 2.2.1 version of Graylog by using the following:
+If you run into issues with the current snapshot you can clone the 2.2.3 version of Graylog by using the following:
 
-`git clone -b "2.2.1" https://github.com/Graylog2/graylog2-server.git`
+`git clone -b "2.2.3" https://github.com/Graylog2/graylog2-server.git`
 
 **TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)". The example below has a few additional packages (crossfilter, d3, dc, deep-equal and immutable).
 
