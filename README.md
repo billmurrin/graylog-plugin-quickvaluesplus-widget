@@ -45,9 +45,9 @@ dramatically by making use of hot reloading. To do this, do the following:
 * `ln -s $YOURPLUGIN plugin/`
 * `npm install && npm start`
 
-If you run into issues with the current snapshot you can clone the 2.2.1 version of Graylog by using the following:
+If you run into issues with the current snapshot you can clone the 2.2.3 version of Graylog by using the following:
 
-`git clone -b "2.2.1" https://github.com/Graylog2/graylog2-server.git`
+`git clone -b "2.2.3" https://github.com/Graylog2/graylog2-server.git`
 
 **TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)". The example below has a few additional packages (crossfilter, d3, dc, deep-equal and immutable).
 
