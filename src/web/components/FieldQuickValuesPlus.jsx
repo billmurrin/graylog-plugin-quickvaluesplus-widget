@@ -105,6 +105,8 @@ const FieldQuickValuesPlus = React.createClass({
     },
     _updateOptionState(configKey, value) {
         let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
+
+        widgetModal.setState({config: newOptions})
         //console.log("In update Options state");
         //let newOptions = this.state.quickValuesOptions;
         //newOptions[configKey] = value;
@@ -165,7 +167,7 @@ const FieldQuickValuesPlus = React.createClass({
                     <div className="pull-right">
                         <AddToDashboardMenu title="Add to dashboard"
                                             widgetType={this.WIDGET_TYPE}
-                                            configuration={{field: this.state.field}}
+                                            configuration={{field: this.state.field, table_size: this.state.quickValuesOptions['table_size'], sort_order: this.state.quickValuesOptions['sort_order'], top_values: this.state.quickValuesOptions['top_values']}}
                                             bsStyle="default"
                                             pullRight
                                             permissions={this.props.permissions}>
