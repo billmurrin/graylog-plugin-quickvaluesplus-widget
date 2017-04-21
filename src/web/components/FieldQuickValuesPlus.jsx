@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Button, DropdownButton} from 'react-bootstrap';
+import {Button, DropdownButton, MenuItem} from 'react-bootstrap';
 import Reflux from 'reflux';
 
 import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualization';
@@ -28,17 +28,19 @@ const FieldQuickValuesPlus = React.createClass({
             data: [],
         };
     },
+    style: require('!style/useable!css!./FieldQuickValuesPlus.css'),
 
     componentWillMount() {
         this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});
     },
     componentDidMount() {
-        console.log("This QValues" + this.state.quickValuesOptions);
+        //console.log("This QValues" + this.state.quickValuesOptions);
+        this.style.use();
         this._loadQuickValuesData();
     },
     componentDidUpdate(oldProps, oldState) {
-        console.log("Old Props");
-        console.log(oldState);
+        //console.log("Old Props: {}", oldProps);
+        //console.log(oldState);
         if (this.state.field !== oldState.field) {
             const element = ReactDOM.findDOMNode(this);
             UIUtils.scrollToHint(element);
@@ -47,8 +49,8 @@ const FieldQuickValuesPlus = React.createClass({
 
     componentWillReceiveProps(nextProps) {
         // Reload values when executed search changes
-        console.log("Next Props");
-        console.log(nextProps);
+        //console.log("Next Props");
+        //console.log(nextProps);
         if (this.props.query !== nextProps.query ||
             this.props.rangeType !== nextProps.rangeType ||
             JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
@@ -59,6 +61,7 @@ const FieldQuickValuesPlus = React.createClass({
     },
 
     componentWillUnmount() {
+        this.style.unuse();
         this._stopTimer();
     },
 
@@ -79,7 +82,7 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({field: field}, () => this._loadQuickValuesData(false));
     },
     _loadQuickValuesData() {
-        console.log("Loading quick values");
+        //console.log("Loading quick values");
         if (this.state.field !== undefined) {
             this.setState({loadPending: true});
             const promise = QuickValuesPlusActions.getQuickValues(this.state.field);
@@ -90,23 +93,32 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState(this.getInitialState());
     },
     sortordermenu: ['ascending', 'descending'],
-    topvaluesmenu: ['5','10','15','20','25'],
-    tablesizemenu: ['10','15','20','25','50','75','100'],
+    topvaluesmenu: [5,10,15,20,25],
+    tablesizemenu: [10,15,20,25,50,75,100],
 
     _submenuItemClassName(configKey, value) {
-        console.log(this.state.quickValuesOptions.toString());
-        console.log("Subclass: Config key is " + configKey);
-        console.log("Subclass: Config key value " + this.state.quickValuesOptions[configKey] + ", Value is " + value);
+        //console.log(this.state.quickValuesOptions.toString());
+        //console.log("Subclass: Config key is " + configKey);
+        //console.log("Subclass: Config key value " + this.state.quickValuesOptions[configKey] + ", Value is " + value);
+        console.log("ConfigKey: " + configKey + ", ConfigVal: " + this.state.quickValuesOptions[configKey] + ", Value: " + value + ", Equal: " + (this.state.quickValuesOptions[configKey] == value));
         return this.state.quickValuesOptions[configKey] === value ? 'selected' : '';
     },
+    _updateOptionState(configKey, value) {
+        let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
+        //console.log("In update Options state");
+        //let newOptions = this.state.quickValuesOptions;
+        //newOptions[configKey] = value;
 
+        this.setState({quickValuesOptions: newOptions});
+        console.log(this.state.quickValuesOptions);
+    },
     _getSubmenu(configKey, values) {
         const submenuItems = values.map((value) => {
             const readableName = value;
             return (
                 <li key={`menu-item-${value}`}>
-                    <a href="#" className={this._submenuItemClassName(configKey, value)} data-type={value}>
-                        {StringUtils.capitalizeFirstLetter(readableName)}
+                    <a href="#" onClick={() => this._updateOptionState(configKey, value)} className={this._submenuItemClassName(configKey, value)} data-type={value}>
+                        {StringUtils.capitalizeFirstLetter(readableName.toString())}
                     </a>
                 </li>
             );
@@ -128,7 +140,7 @@ const FieldQuickValuesPlus = React.createClass({
                 {this._getSubmenu('top_values', this.topvaluesmenu)}
             </li>,
             <li key="table_size-submenu" className="dropdown-submenu left-submenu">
-                <a href="#">Top Values</a>
+                <a href="#">Table Size</a>
                 {this._getSubmenu('table_size', this.tablesizemenu)}
             </li>,
         ];
