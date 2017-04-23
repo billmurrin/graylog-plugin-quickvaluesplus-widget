@@ -7,7 +7,7 @@ The QuickValuesPlus Widget is an enhanced fork of the GrayLog2 Quick Values Widg
 
 When the QuickValuesPlus Widget is added to a stream as a field analyzer it adds a "Remove from search" button. The button will negate the field in the search bar (E.g. !field_name:foo).
 
-![alt text](http://i.imgur.com/0tfXFTu.png "Remove From Search Button")
+![alt text](http://i.imgur.com/uthGeG1.png "Remove From Search Button")
 
 In addition, the QuickValuesPlus Widget has extra features when added to dashboards, such as:
  * Support for **ascending** OR **descending** sort order in the datatable. Can now obtain true bottom values.
