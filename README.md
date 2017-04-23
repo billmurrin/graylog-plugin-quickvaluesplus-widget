@@ -16,7 +16,7 @@ In addition, the QuickValuesPlus Widget has extra features when added to dashboa
   
 ![alt text](http://i.imgur.com/7PLDXCW.png "Example of Configuration Options")
 
-In version 2.1.0, an options menu was introduced to help control the sort order, number of top values and the table size of the plugin when used in Search.
+In version 2.1.0, a Customization menu was introduced to help control the sort order, number of top values and the table size of the plugin when used in Search.
 
 ![alt text](http://i.imgur.com/TsZQxil.png "Example of Options Menu")
 
