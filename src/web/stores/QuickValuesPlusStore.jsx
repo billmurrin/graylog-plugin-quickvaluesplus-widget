@@ -35,8 +35,10 @@ export const QuickValuesPlusStore = Reflux.createStore({
         }
         let url = ApiRoutes.UniversalSearchApiController.fieldTerms(rangeType, originalSearchURLParams.get('q') || '*', field, timerange, streamId).url;
         url = URLUtils.qualifyUrl(url);
+
+        //If it was set, append the optional Size parameter to the query.
         if (tableSize !== undefined) url = url + "&size=" + tableSize;
-        console.log("The new URL is " + url);
+
         const promise = fetch('GET', url);
         promise.catch(function (error) {
             UserNotification.error('Loading quick values failed with status: ' + error, 'Could not load quick values');
