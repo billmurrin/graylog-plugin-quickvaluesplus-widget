@@ -45,8 +45,6 @@ const QuickValuesPlusVisualization = React.createClass({
         };
     },
     componentDidMount() {
-        console.log("Component Mounted. Initial Configuration");
-        console.log(this.props.config);
         if (this.props.config.sort_order === "descending") {
             this.sortOrder = d3.descending;
         } else {

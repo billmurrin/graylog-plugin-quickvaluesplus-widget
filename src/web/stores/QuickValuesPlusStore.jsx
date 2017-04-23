@@ -16,7 +16,7 @@ export const QuickValuesPlusStore = Reflux.createStore({
     listenables: [QuickValuesPlusActions],
     getInitialState() {
     },
-    getQuickValues(field) {
+    getQuickValues(field, tableSize) {
         const originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
         const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
         const rangeType = originalSearchURLParams.get('rangetype');
@@ -34,9 +34,9 @@ export const QuickValuesPlusStore = Reflux.createStore({
                 break;
         }
         let url = ApiRoutes.UniversalSearchApiController.fieldTerms(rangeType, originalSearchURLParams.get('q') || '*', field, timerange, streamId).url;
-        //alert("url is " + url);
         url = URLUtils.qualifyUrl(url);
-        //alert("URL2 is " + url);
+        if (tableSize !== undefined) url = url + "&size=" + tableSize;
+        console.log("The new URL is " + url);
         const promise = fetch('GET', url);
         promise.catch(function (error) {
             UserNotification.error('Loading quick values failed with status: ' + error, 'Could not load quick values');

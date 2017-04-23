@@ -34,13 +34,10 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});
     },
     componentDidMount() {
-        //console.log("This QValues" + this.state.quickValuesOptions);
         this.style.use();
         this._loadQuickValuesData();
     },
     componentDidUpdate(oldProps, oldState) {
-        //console.log("Old Props: {}", oldProps);
-        //console.log(oldState);
         if (this.state.field !== oldState.field) {
             const element = ReactDOM.findDOMNode(this);
             UIUtils.scrollToHint(element);
@@ -49,8 +46,6 @@ const FieldQuickValuesPlus = React.createClass({
 
     componentWillReceiveProps(nextProps) {
         // Reload values when executed search changes
-        //console.log("Next Props");
-        //console.log(nextProps);
         if (this.props.query !== nextProps.query ||
             this.props.rangeType !== nextProps.rangeType ||
             JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
@@ -82,10 +77,9 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({field: field}, () => this._loadQuickValuesData(false));
     },
     _loadQuickValuesData() {
-        //console.log("Loading quick values");
         if (this.state.field !== undefined) {
             this.setState({loadPending: true});
-            const promise = QuickValuesPlusActions.getQuickValues(this.state.field);
+            const promise = QuickValuesPlusActions.getQuickValues(this.state.field, 50);
             promise.then((data) => this.setState({data: data, loadPending: false}));
         }
     },
@@ -97,21 +91,14 @@ const FieldQuickValuesPlus = React.createClass({
     tablesizemenu: [10,15,20,25,50,75,100],
 
     _submenuItemClassName(configKey, value) {
-        //console.log(this.state.quickValuesOptions.toString());
-        //console.log("Subclass: Config key is " + configKey);
-        //console.log("Subclass: Config key value " + this.state.quickValuesOptions[configKey] + ", Value is " + value);
-        console.log("ConfigKey: " + configKey + ", ConfigVal: " + this.state.quickValuesOptions[configKey] + ", Value: " + value + ", Equal: " + (this.state.quickValuesOptions[configKey] == value));
         return this.state.quickValuesOptions[configKey] === value ? 'selected' : '';
     },
     _updateOptionState(configKey, value) {
         let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
         this.refs.thedash.refs.widgetModal.setState({config: newOptions});
-        //console.log("In update Options state");
-        //let newOptions = this.state.quickValuesOptions;
-        //newOptions[configKey] = value;
-
         this.setState({quickValuesOptions: newOptions});
-        console.log(this.state.quickValuesOptions);
+        const promise = QuickValuesPlusActions.getQuickValues(this.state.field, newOptions['table_size']);
+        promise.then((data) => this.setState({data: data, loadPending: false}));
     },
     _getSubmenu(configKey, values) {
         const submenuItems = values.map((value) => {
