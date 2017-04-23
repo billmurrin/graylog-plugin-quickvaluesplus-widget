@@ -7,7 +7,7 @@ The QuickValuesPlus Widget is an enhanced fork of the GrayLog2 Quick Values Widg
 
 When the QuickValuesPlus Widget is added to a stream as a field analyzer it adds a "Remove from search" button. The button will negate the field in the search bar (E.g. !field_name:foo).
 
-![alt text](http://i.imgur.com/0tfXFTu.png "Remove From Search Button")
+![alt text](http://i.imgur.com/uthGeG1.png "Remove From Search Button")
 
 In addition, the QuickValuesPlus Widget has extra features when added to dashboards, such as:
  * Support for **ascending** OR **descending** sort order in the datatable. Can now obtain true bottom values.
@@ -16,15 +16,25 @@ In addition, the QuickValuesPlus Widget has extra features when added to dashboa
   
 ![alt text](http://i.imgur.com/7PLDXCW.png "Example of Configuration Options")
 
-**Required Graylog versions:**
-* Version 1.0.0 was tested and is compatible with Graylog version 2.1.3
-* Version 2.0.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3
+In version 2.1.0, a Customization menu was introduced to help control the sort order, number of top values and the table size of the plugin when used in Search.
+
+![alt text](http://i.imgur.com/TsZQxil.png "Example of Options Menu")
+
+Options Menu Caveat
+-----------
+
+Right now, Graylog's REST API does not support a sort option for the RelativeSearch lookup on /terms. I plan on doing a Pull Request for this in the future.
+
+With that means is that at this time we cannot obtain a "TRUE" ascending order query. The ascending order observed is actually based on a descending ordered query. 
+
+If you want a true ascending query, simply add the visualization as a dashboard. The widget code does obtain the *TRUE* ascending order query. 
+
+Required Graylog Versions
+-----------
+* Version 1.0.0 was tested and is compatible with Graylog version 2.1.3. 
+* Version 2.1.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3
  
 Please file a bug report providing as much detail as possible if you find that the plugin is not working.
-
-Way Ahead (Next Version)
------------
- * Add customize menu to widget when attached to a stream which allows ability to toggle sort order, top values and table size.
 
 Installation
 ------------
@@ -34,6 +44,12 @@ is the `plugins/` folder relative from your `graylog-server` directory by defaul
 and can be configured in your `graylog.conf` file.
 
 Restart `graylog-server` and you are done.
+
+Way Ahead - Next Version(s)
+-----------
+ * Add support to modify the field of the widget.
+ * Add code to make the Dropdown menu go away after a selection.
+ * Add a System Configuration menu to allow users to change the global defaults for sort order, top values, and table size.
 
 Development
 -----------
@@ -96,16 +112,3 @@ This project is using Maven 3 and requires Java 8 or higher.
 * Optional: Run `mvn jdeb:jdeb` and `mvn rpm:rpm` to create a DEB and RPM package respectively.
 * Copy generated JAR file in target directory to your Graylog plugin directory.
 * Restart the Graylog.
-
-Plugin Release
---------------
-
-We are using the maven release plugin:
-
-```
-$ mvn release:prepare
-[...]
-$ mvn release:perform
-```
-
-This sets the version numbers, creates a tag and pushes to GitHub. Travis CI will build the release artifacts and upload to GitHub automatically.

@@ -1,15 +1,17 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Button} from 'react-bootstrap';
+import {Button, DropdownButton, MenuItem} from 'react-bootstrap';
 import Reflux from 'reflux';
 
 import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
+import StringUtils from 'util/StringUtils';
 import UIUtils from 'util/UIUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 import { QuickValuesPlusActions, QuickValuesPlusStore } from  'stores/QuickValuesPlusStore';
+
 const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldQuickValuesPlus = React.createClass({
@@ -26,8 +28,13 @@ const FieldQuickValuesPlus = React.createClass({
             data: [],
         };
     },
+    style: require('!style/useable!css!./FieldQuickValuesPlus.css'),
 
+    componentWillMount() {
+        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});
+    },
     componentDidMount() {
+        this.style.use();
         this._loadQuickValuesData();
     },
     componentDidUpdate(oldProps, oldState) {
@@ -49,6 +56,7 @@ const FieldQuickValuesPlus = React.createClass({
     },
 
     componentWillUnmount() {
+        this.style.unuse();
         this._stopTimer();
     },
 
@@ -71,23 +79,66 @@ const FieldQuickValuesPlus = React.createClass({
     _loadQuickValuesData() {
         if (this.state.field !== undefined) {
             this.setState({loadPending: true});
-            const promise = QuickValuesPlusActions.getQuickValues(this.state.field);
+            const promise = QuickValuesPlusActions.getQuickValues(this.state.field, 50);
             promise.then((data) => this.setState({data: data, loadPending: false}));
         }
     },
     _resetStatus() {
         this.setState(this.getInitialState());
     },
+    sortordermenu: ['ascending', 'descending'],
+    topvaluesmenu: [5,10,15,20,25],
+    tablesizemenu: [10,15,20,25,50,75,100],
+
+    _submenuItemClassName(configKey, value) {
+        return this.state.quickValuesOptions[configKey] === value ? 'selected' : '';
+    },
+    _updateOptionState(configKey, value) {
+        let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
+        this.refs.thedash.refs.widgetModal.setState({config: newOptions});
+        this.setState({quickValuesOptions: newOptions});
+        const promise = QuickValuesPlusActions.getQuickValues(this.state.field, newOptions['table_size']);
+        promise.then((data) => this.setState({data: data, loadPending: false}));
+    },
+    _getSubmenu(configKey, values) {
+        const submenuItems = values.map((value) => {
+            const readableName = value;
+            return (
+                <li key={`menu-item-${value}`}>
+                    <a href="#" onClick={() => this._updateOptionState(configKey, value)} className={this._submenuItemClassName(configKey, value)} data-type={value}>
+                        {StringUtils.capitalizeFirstLetter(readableName.toString())}
+                    </a>
+                </li>
+            );
+        });
+
+        return <ul className={`dropdown-menu ${configKey}-selector`}>{submenuItems}</ul>;
+    },
     render() {
         let content;
-
         let inner;
+
+        const submenus = [
+            <li key="sort_order-submenu" className="dropdown-submenu left-submenu">
+                <a href="#">Sort Order</a>
+                {this._getSubmenu('sort_order', this.sortordermenu)}
+            </li>,
+            <li key="top_values-submenu" className="dropdown-submenu left-submenu">
+                <a href="#">Top Values</a>
+                {this._getSubmenu('top_values', this.topvaluesmenu)}
+            </li>,
+            <li key="table_size-submenu" className="dropdown-submenu left-submenu">
+                <a href="#">Table Size</a>
+                {this._getSubmenu('table_size', this.tablesizemenu)}
+            </li>,
+        ];
+
         if (this.state.data.length === 0) {
             inner = <Spinner />;
         } else {
             inner = (
                 <QuickValuesPlusVisualization id={this.state.field}
-                                          config={{top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}}
+                                          config={this.state.quickValuesOptions}
                                           data={this.state.data}
                                           horizontal
                                           displayAddToSearchButton
@@ -101,12 +152,16 @@ const FieldQuickValuesPlus = React.createClass({
                 <div className="content-col">
                     <div className="pull-right">
                         <AddToDashboardMenu title="Add to dashboard"
+                                            ref="thedash"
                                             widgetType={this.WIDGET_TYPE}
-                                            configuration={{field: this.state.field}}
+                                            configuration={{field: this.state.field, table_size: this.state.quickValuesOptions['table_size'], sort_order: this.state.quickValuesOptions['sort_order'], top_values: this.state.quickValuesOptions['top_values']}}
                                             bsStyle="default"
                                             pullRight
                                             permissions={this.props.permissions}>
                             <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
+                            <DropdownButton bsSize="small" className="quickvalues-settings" title="Customize" id="customize-quick-values-plus-dropdown">
+                                {submenus}
+                            </DropdownButton>
                         </AddToDashboardMenu>
                     </div>
                     <h1>Quick Values for {this.state.field} {this.state.loadPending && <i

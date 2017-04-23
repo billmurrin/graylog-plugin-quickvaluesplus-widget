@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import { Input } from 'react-bootstrap';
+import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualization';
 
 const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
   propTypes: {
@@ -8,6 +9,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
   },
 
   getInitialConfiguration() {
+
     return {
       top_values: 5,
       table_size: 50,

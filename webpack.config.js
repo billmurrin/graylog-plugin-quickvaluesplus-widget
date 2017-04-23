@@ -4,4 +4,5 @@ const path = require('path');
 
 // Remember to use the same name here and in `getUniqueId()` in the java MetaData class
 module.exports = new PluginWebpackConfig('org.graylog.plugins.quickvaluesplus.QuickValuesPlusWidgetPlugin', loadBuildConfig(path.resolve(__dirname, './build.config')), {
+    test: /\.css$/, loader: "style-loader!css-loader"
 });
