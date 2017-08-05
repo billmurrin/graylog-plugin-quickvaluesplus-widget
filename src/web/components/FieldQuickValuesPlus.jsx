@@ -8,9 +8,10 @@ import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import StringUtils from 'util/StringUtils';
 import UIUtils from 'util/UIUtils';
-
 import StoreProvider from 'injection/StoreProvider';
 import { QuickValuesPlusActions, QuickValuesPlusStore } from  'stores/QuickValuesPlusStore';
+
+import style from '!style/useable!css!./FieldQuickValuesPlus.css';
 
 const RefreshStore = StoreProvider.getStore('Refresh');
 
@@ -28,7 +29,7 @@ const FieldQuickValuesPlus = React.createClass({
             data: [],
         };
     },
-    style: require('!style/useable!css!./FieldQuickValuesPlus.css'),
+    style: style,
 
     componentWillMount() {
         this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});

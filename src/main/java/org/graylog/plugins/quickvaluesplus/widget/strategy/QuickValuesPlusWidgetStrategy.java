@@ -21,7 +21,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.indexer.results.TermsResult;
-import org.graylog.plugins.quickvaluesplus.indexer.searches.Searches;
+import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -59,6 +60,7 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
         this.query = (String)config.get("query");
         this.sortOrder = (String)config.get("sort_order").toString();
 
+
         this.field = (String) config.get("field");
         this.streamId = (String) config.get("stream_id");
         this.tableSize = Integer.parseInt(config.get("table_size").toString());
@@ -71,7 +73,9 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
             filter = "streams:" + streamId;
         }
 
-        final TermsResult terms = searches.terms(field, this.tableSize, query, filter, this.timeRange, this.sortOrder);
+        Sorting.Direction sortDirection = (this.sortOrder.equals("descending")) ? Sorting.Direction.DESC : Sorting.Direction.ASC;
+
+        final TermsResult terms = searches.terms(field, this.tableSize, query, filter, this.timeRange, sortDirection);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("terms", terms.getTerms());
@@ -79,7 +83,7 @@ public class QuickValuesPlusWidgetStrategy implements WidgetStrategy {
         result.put("other", terms.getOther());
         result.put("missing", terms.getMissing());
 
-        return new ComputationResult(result, terms.took().millis());
+        return new ComputationResult(result, terms.tookMs());
     }
 
     private boolean checkConfig(Map<String, Object> config) {
