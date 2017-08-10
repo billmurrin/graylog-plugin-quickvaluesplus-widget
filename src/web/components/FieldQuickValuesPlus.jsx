@@ -27,6 +27,7 @@ const FieldQuickValuesPlus = React.createClass({
         return {
             field: undefined,
             data: [],
+            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}
         };
     },
     style: style,
@@ -80,7 +81,7 @@ const FieldQuickValuesPlus = React.createClass({
     _loadQuickValuesData() {
         if (this.state.field !== undefined) {
             this.setState({loadPending: true});
-            const promise = QuickValuesPlusActions.getQuickValues(this.state.field, 50);
+            const promise = QuickValuesPlusActions.getQuickValues(this.state.field, 50, "descending");
             promise.then((data) => this.setState({data: data, loadPending: false}));
         }
     },
@@ -98,7 +99,7 @@ const FieldQuickValuesPlus = React.createClass({
         let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
         this.refs.thedash.refs.widgetModal.setState({config: newOptions});
         this.setState({quickValuesOptions: newOptions});
-        const promise = QuickValuesPlusActions.getQuickValues(this.state.field, newOptions['table_size']);
+        const promise = QuickValuesPlusActions.getQuickValues(this.state.field, newOptions['table_size'], newOptions['sort_order']);
         promise.then((data) => this.setState({data: data, loadPending: false}));
     },
     _getSubmenu(configKey, values) {
