@@ -16,10 +16,11 @@ export const QuickValuesPlusStore = Reflux.createStore({
     listenables: [QuickValuesPlusActions],
     getInitialState() {
     },
-    getQuickValues(field, tableSize) {
+    getQuickValues(field, tableSize, sortOrder) {
         const originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
         const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
         const rangeType = originalSearchURLParams.get('rangetype');
+        let sort_order = (sortOrder === "descending") ? 'desc' : 'asc';
         let timerange = {};
         switch (rangeType) {
             case 'relative':
@@ -36,8 +37,11 @@ export const QuickValuesPlusStore = Reflux.createStore({
         let url = ApiRoutes.UniversalSearchApiController.fieldTerms(rangeType, originalSearchURLParams.get('q') || '*', field, timerange, streamId).url;
         url = URLUtils.qualifyUrl(url);
 
-        //If it was set, append the optional Size parameter to the query.
+        // If it was set, append the optional Size parameter to the query.
         if (tableSize !== undefined) url = url + "&size=" + tableSize;
+
+        // Append the sort order if we are using Relative time.
+        if (rangeType === "relative") url = url + "&order=" + field + ":" + sort_order;
 
         const promise = fetch('GET', url);
         promise.catch(function (error) {
