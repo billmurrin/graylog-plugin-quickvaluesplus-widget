@@ -16,7 +16,12 @@
   "author": "Bill Murrin <bill@billmurrin.com>",
   "license": "MIT",
   "dependencies": {
-    "reflux": "^0.2.12"
+    "bootstrap": "3.3.6",	  
+    "reflux": "^0.2.12",
+    "crossfilter": "1.3.x",
+    "d3": "3.5.17",
+    "dc": "2.0.0-beta.19",
+    "immutable": "^3.7.5"
   },
   "devDependencies": {
     "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
