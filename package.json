@@ -16,18 +16,14 @@
   "author": "Bill Murrin <bill@billmurrin.com>",
   "license": "MIT",
   "dependencies": {
-    "bootstrap": "3.3.6",
+    "bootstrap": "3.3.6",	  
     "reflux": "^0.2.12",
     "crossfilter": "1.3.x",
     "d3": "3.5.17",
     "dc": "2.0.0-beta.19",
-    "deep-equal": "^1.0.1",
     "immutable": "^3.7.5"
   },
   "devDependencies": {
-    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin",
-    "json-loader": "^0.5.4",
-    "style-loader": "^0.16.1",
-    "css-loader": "^0.26.1"
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
   }
 }
