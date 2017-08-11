@@ -26,13 +26,17 @@ const FieldQuickValuesPlus = React.createClass({
     getInitialState() {
         return {
             field: undefined,
+            dropdownIsOpen: false,
             data: [],
             quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}
         };
     },
     style: style,
-
+    toggleDropdown() {
+        this.setState({dropdownIsOpen: !this.state.dropdownIsOpen});
+    },
     componentWillMount() {
+        this.setState({ dropdownIsOpen: false });
         this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});
     },
     componentDidMount() {
@@ -106,7 +110,7 @@ const FieldQuickValuesPlus = React.createClass({
         const submenuItems = values.map((value) => {
             const readableName = value;
             return (
-                <li key={`menu-item-${value}`}>
+                <li key={`menu-item-${value}`} onClick={() => this.toggleDropdown()}>
                     <a href="#" onClick={() => this._updateOptionState(configKey, value)} className={this._submenuItemClassName(configKey, value)} data-type={value}>
                         {StringUtils.capitalizeFirstLetter(readableName.toString())}
                     </a>
@@ -161,7 +165,7 @@ const FieldQuickValuesPlus = React.createClass({
                                             pullRight
                                             permissions={this.props.permissions}>
                             <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
-                            <DropdownButton bsSize="small" className="quickvalues-settings" title="Customize" id="customize-quick-values-plus-dropdown">
+                            <DropdownButton bsSize="small" className="quickvalues-settings" title="Customize" id="customize-quick-values-plus-dropdown" onToggle={() => this.toggleDropdown()} open={this.state.dropdownIsOpen} >
                                 {submenus}
                             </DropdownButton>
                         </AddToDashboardMenu>
