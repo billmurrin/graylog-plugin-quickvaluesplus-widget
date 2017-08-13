@@ -12,6 +12,15 @@ const QuickValuesPlusWidgetEditConfiguration = React.createClass({
     return (
       <fieldset>
         <QueryConfiguration {...this.props}/>
+          <Input key="dataField"
+                 type="text"
+                 id="quickvaluesplus-field"
+                 name="field"
+                 label="Field"
+                 value={this.props.config.field}
+                 onChange={this.props.onChange}
+                 help="The name of the field that the query is based on."/>
+
           <Input key="dataTopValues"
                  type="text"
                  id="quickvaluesplus-top-values"
