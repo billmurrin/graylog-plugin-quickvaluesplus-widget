@@ -1,6 +1,5 @@
 import React, {PropTypes} from 'react';
-import { Input } from 'react-bootstrap';
-import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualization';
+import { Input } from 'components/bootstrap';
 
 const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
   propTypes: {
@@ -9,7 +8,6 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
   },
 
   getInitialConfiguration() {
-
     return {
       top_values: 5,
       table_size: 50,
@@ -45,7 +43,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
               <label>
                   <input key="dataSortOrderDesc"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
                          onChange={this.props.onChange}
-                         checked={this.props.config.sort_order === "descending"}/>
+                         checked={this.props.config.sort_order === "descending"} />
                   Descending
               </label>
           </div>
@@ -53,7 +51,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
               <label>
                   <input key="dataSortOrderAsc" id="quickvaluesplus-sort-order-ascending" type="radio" name="sort_order" value="ascending"
                          onChange={this.props.onChange}
-                         checked={this.props.config.sort_order === "ascending"}/>
+                         checked={this.props.config.sort_order === "ascending"} />
                   Ascending
               </label>
           </div>
@@ -65,7 +63,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                label="Show pie chart"
                checked={this.props.config.show_pie_chart}
                onChange={this.props.onChange}
-               help="Include a pie chart representation of the data."/>
+               help="Include a pie chart representation of the data." />
 
         <Input key="showDataTable"
                type="checkbox"
@@ -74,7 +72,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                label="Show data table"
                checked={this.props.config.show_data_table}
                onChange={this.props.onChange}
-               help="Include a table with quantitative information."/>
+               help="Include a table with quantitative information." />
       </fieldset>
     );
   },
