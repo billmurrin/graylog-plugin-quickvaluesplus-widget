@@ -136,11 +136,30 @@ const QuickValuesPlusVisualization = React.createClass({
         replaySearchButton.innerHTML = "<i class='fa fa-external-link'></i>";
         return replaySearchButton.outerHTML;
     },
+    escape(searchTerm) {
+        var escapedTerm = String(searchTerm);
+
+        // Replace newlines.
+        escapedTerm = escapedTerm.replace(/\r\n/g, " ");
+        escapedTerm = escapedTerm.replace(/\n/g, " ");
+        escapedTerm = escapedTerm.replace(/<br>/g, " ");
+
+        // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
+        escapedTerm = String(escapedTerm).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+
+        if (/\s/g.test(escapedTerm)) {
+            escapedTerm = '"' + escapedTerm + '"';
+        }
+
+        return escapedTerm;
+    },
     _excludeQueryClick(term) {
-        let newquery = (this.props.config.query == "") ? "!" + this.props.config.field + ":" + term : this.props.config.query + " AND !" + this.props.config.field + ":" + term;
+        let escTerm = this.escape(term);
+        let newquery = (this.props.config.query == "") ? "!" + this.props.config.field + ":" + escTerm : this.props.config.query + " AND !" + this.props.config.field + ":" + escTerm;
+
         const config = this.props.config;
         config.query = newquery;
-        let widget = {}
+        let widget = {};
         // First, let's load the widget
         const loadWidgetPromise = WidgetsStore.loadWidget(this.props.config.dashboardID, this.props.id);
         loadWidgetPromise.then(
@@ -209,7 +228,9 @@ const QuickValuesPlusVisualization = React.createClass({
                 }
 
                 if (this.props.config.field) {
-                    let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + `${d.term}` : this.props.config.query + " AND " + this.props.config.field + ":" + `${d.term}`;
+                    //Properly format strings containing spaces, backslashes and colons.
+                    let escTerm = this.escape(`${d.term}`);
+                    let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
                     let replayURL = Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
                     return `${colourBadge} <a href="${replayURL}">${d.term}</a>`;
 
@@ -239,9 +260,10 @@ const QuickValuesPlusVisualization = React.createClass({
                 columns.push((d) => this._getExcludeFromQueryButton(d.term));
             }
 
-
             columns.push((d) => {
-                let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + `${d.term}` : this.props.config.query + " AND " + this.props.config.field + ":" + `${d.term}`;
+                //Properly format strings containing spaces, backslashes and colons.
+                let escTerm = this.escape(`${d.term}`);
+                let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
                 let replayURL = Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
                 return this._getTermReplyInNewWindowButton(replayURL);
             });
@@ -507,8 +529,8 @@ const QuickValuesPlusVisualization = React.createClass({
                         <thead>
                         <tr>
                           <th style={{ width: '50%' }}>Value</th>
-                          <th>%</th>
-                          <th>Count</th>
+                          <th style={{ alignItems: 'center' }}>%</th>
+                          <th style={{ alignItems: 'center' }}>#</th>
                             {this.props.displayAddToSearchButton &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
@@ -516,10 +538,10 @@ const QuickValuesPlusVisualization = React.createClass({
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
                             {this.props.config.dashboardID &&
-                            <th style={{ width: 30 }}>&nbsp;</th>
+                            <th style={{ width: 28 }}>&nbsp;</th>
                             }
                             {this.props.config.field &&
-                            <th style={{ width: 30 }}>&nbsp;</th>
+                            <th style={{ width: 28 }}>&nbsp;</th>
                             }
                         </tr>
                         </thead>
