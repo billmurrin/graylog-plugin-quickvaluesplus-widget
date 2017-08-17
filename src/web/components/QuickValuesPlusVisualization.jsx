@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Button, Panel, ListGroup, ListGroupItem, LinkContainer } from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
-
+import Reflux from 'reflux';
 import $ from 'jquery';
 global.jQuery = $;
 require('bootstrap/js/tooltip');
@@ -14,14 +14,19 @@ const D3Utils = require('util/D3Utils');
 const StringUtils = require('util/StringUtils');
 import NumberUtils from 'util/NumberUtils';
 
+import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 const SearchStore = StoreProvider.getStore('Search');
+import Routes from 'routing/Routes';
 
 const QuickValuesPlusVisualization = React.createClass({
+    mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
     propTypes: {
         id: PropTypes.string,
         config: PropTypes.object,
-        width: PropTypes.any,
+        widget: PropTypes.object,
         height: PropTypes.any,
         horizontal: PropTypes.bool,
         displayAnalysisInformation: PropTypes.bool,
@@ -124,6 +129,63 @@ const QuickValuesPlusVisualization = React.createClass({
         return addToSearchButton.outerHTML;
     },
 
+    _getTermReplyInNewWindowButton(replayURL) {
+        const replaySearchButton = document.createElement('a');
+        replaySearchButton.id = 'addNewWindowTermReplay';
+        replaySearchButton.className = 'btn btn-xs btn-default';
+        replaySearchButton.title = 'Open Related Search In New Window';
+        replaySearchButton.setAttribute('href', replayURL);
+        replaySearchButton.setAttribute('target', '_blank');
+        replaySearchButton.innerHTML = "<i class='fa fa-external-link'></i>";
+        return replaySearchButton.outerHTML;
+    },
+    escape(searchTerm) {
+        var escapedTerm = String(searchTerm);
+
+        // Replace newlines.
+        escapedTerm = escapedTerm.replace(/\r\n/g, " ");
+        escapedTerm = escapedTerm.replace(/\n/g, " ");
+        escapedTerm = escapedTerm.replace(/<br>/g, " ");
+
+        // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
+        escapedTerm = String(escapedTerm).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+
+        if (/\s/g.test(escapedTerm)) {
+            escapedTerm = '"' + escapedTerm + '"';
+        }
+
+        return escapedTerm;
+    },
+    _excludeQueryClick(term) {
+        let escTerm = this.escape(term);
+        let newquery = (this.props.config.query == "") ? "!" + this.props.config.field + ":" + escTerm : this.props.config.query + " AND !" + this.props.config.field + ":" + escTerm;
+
+        const config = this.props.config;
+        config.query = newquery;
+        let widget = {};
+        // First, let's load the widget
+        const loadWidgetPromise = WidgetsStore.loadWidget(this.props.config.dashboardID, this.props.id);
+        loadWidgetPromise.then(
+            response => {
+                widget = response;
+                widget['config'] = config;
+                delete widget.creator_user_id;
+                const updateWidgetPromise = WidgetsStore.updateWidget(this.props.config.dashboardID, widget);
+                updateWidgetPromise.done();
+            });
+    },
+    _getExcludeFromQueryButton(term) {
+        const excludeFromQueryButton = document.createElement('button');
+        excludeFromQueryButton.id = 'excludeTermFromQuery';
+        excludeFromQueryButton.className = 'btn btn-xs btn-default';
+        excludeFromQueryButton.title = 'Exclude term from search query';
+        excludeFromQueryButton.setAttribute('data-term', StringUtils.unescapeHTML(term));
+        excludeFromQueryButton.innerHTML = "<i class='fa fa-search-minus'></i>";
+
+        return excludeFromQueryButton.outerHTML;
+
+    },
+
     _getRemoveFromSearchButton(term) {
         const removeFromSearchButton = document.createElement('button');
         removeFromSearchButton.id = 'removeSearchTerm';
@@ -134,7 +196,30 @@ const QuickValuesPlusVisualization = React.createClass({
 
         return removeFromSearchButton.outerHTML;
     },
+    _getTimeRange() {
+        const config = this.props.config;
+        const rangeType = config.timerange.type;
 
+        const timeRange = {
+            rangetype: rangeType,
+        };
+        switch (rangeType) {
+            case 'relative':
+                timeRange[rangeType] = config.timerange.range;
+                break;
+            case 'absolute':
+                timeRange.from = config.timerange.from;
+                timeRange.to = config.timerange.to;
+                break;
+            case 'keyword':
+                timeRange[rangeType] = config.timerange.keyword;
+                break;
+            default:
+            // do nothing
+        }
+
+        return timeRange;
+    },
     _getDataTableColumns() {
         const columns = [
             (d) => {
@@ -145,7 +230,19 @@ const QuickValuesPlusVisualization = React.createClass({
                     colourBadge = `<span class="datatable-badge" style="background-color: ${colour}"></span>`;
                 }
 
-                return `${colourBadge} ${d.term}`;
+                if (this.props.config.field) {
+                    //Properly format strings containing spaces, backslashes and colons.
+                    let escTerm = this.escape(`${d.term}`);
+                    let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
+                    let replayURL = Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
+                    return `${colourBadge} <a href="${replayURL}">${d.term}</a>`;
+
+                }
+                else
+                {
+                    return `${colourBadge} ${d.term}`;
+                }
+
             },
             (d) => {
                 return NumberUtils.formatPercentage(d.percentage);
@@ -161,6 +258,21 @@ const QuickValuesPlusVisualization = React.createClass({
             columns.push((d) => this._getRemoveFromSearchButton(d.term));
         }
 
+        if (this.props.config.dashboardID) {
+            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+                columns.push((d) => this._getExcludeFromQueryButton(d.term));
+            }
+        }
+
+        if (this.props.config.field) {
+            columns.push((d) => {
+                //Properly format strings containing spaces, backslashes and colons.
+                let escTerm = this.escape(`${d.term}`);
+                let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
+                let replayURL = Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
+                return this._getTermReplyInNewWindowButton(replayURL);
+            });
+        }
         return columns;
     },
     _renderDataTable() {
@@ -192,6 +304,12 @@ const QuickValuesPlusVisualization = React.createClass({
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm("!" + this.props.id, term);
                     });
+                    table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
+                        if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+                            const term = $(d3.event.target).closest('button').data('term');
+                            this._excludeQueryClick(term);
+                        }
+                    });
                 });
 
         } else {
@@ -218,6 +336,12 @@ const QuickValuesPlusVisualization = React.createClass({
                         // noinspection Eslint
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm("!" + this.props.id, term);
+                    });
+                    table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
+                        // noinspection Eslint
+
+                        const term = $(d3.event.target).closest('button').data('term');
+                        this._excludeQueryClick(term);
                     });
                 });
         }
@@ -353,6 +477,7 @@ const QuickValuesPlusVisualization = React.createClass({
         return <span dangerouslySetInnerHTML={{ __html: `${analysisInformation.join(',')}.` }}/>;
     },
     render() {
+
         let pieChartClassName;
         const pieChartStyle = {};
 
@@ -397,6 +522,17 @@ const QuickValuesPlusVisualization = React.createClass({
             pieChart = <div ref="graph" className="quickvalues-graph"/>;
         }
 
+        let excludeQueryButton;
+        if (this.props.config.dashboardID) {
+            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+                excludeQueryButton = (
+                    <th style={{ width: 28 }}>&nbsp;</th>
+                );
+            } else {
+                excludeQueryButton = '';
+            }
+        }
+
         return (
             <div id={`visualization-${this.props.id}`} className="quickvalues-visualization"
                  style={{ height: this.props.height }}>
@@ -410,14 +546,18 @@ const QuickValuesPlusVisualization = React.createClass({
                       <table ref="table" className="table table-condensed table-hover">
                         <thead>
                         <tr>
-                          <th style={{ width: '60%' }}>Value</th>
-                          <th>%</th>
-                          <th>Count</th>
+                          <th style={{ width: '50%' }}>Value</th>
+                          <th style={{ alignItems: 'center' }}>%</th>
+                          <th style={{ alignItems: 'center' }}>#</th>
                             {this.props.displayAddToSearchButton &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
                             {this.props.displayRemoveFromSearchButton &&
                             <th style={{ width: 30 }}>&nbsp;</th>
+                            }
+                            {excludeQueryButton}
+                            {this.props.config.field &&
+                            <th style={{ width: 28 }}>&nbsp;</th>
                             }
                         </tr>
                         </thead>

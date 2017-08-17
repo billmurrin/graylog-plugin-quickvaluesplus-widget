@@ -4,7 +4,7 @@ import {Button, DropdownButton, MenuItem} from 'react-bootstrap';
 import Reflux from 'reflux';
 
 import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualization';
-import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
+import AddToDashboardMenuRev from 'components/AddToDashboardMenuRev';
 import Spinner from 'components/common/Spinner';
 import StringUtils from 'util/StringUtils';
 import UIUtils from 'util/UIUtils';
@@ -18,6 +18,7 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 const FieldQuickValuesPlus = React.createClass({
     propTypes: {
         permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+        dashboard_id: PropTypes.string,
     },
     mixins: [
         Reflux.connect(QuickValuesPlusStore),
@@ -120,9 +121,12 @@ const FieldQuickValuesPlus = React.createClass({
 
         return <ul className={`dropdown-menu ${configKey}-selector`}>{submenuItems}</ul>;
     },
+    echoStatus: '',
+
     render() {
         let content;
         let inner;
+        let myvalue;
 
         const submenus = [
             <li key="sort_order-submenu" className="dropdown-submenu left-submenu">
@@ -157,7 +161,7 @@ const FieldQuickValuesPlus = React.createClass({
             content = (
                 <div className="content-col">
                     <div className="pull-right">
-                        <AddToDashboardMenu title="Add to dashboard"
+                        <AddToDashboardMenuRev title="Add to dashboard"
                                             ref="thedash"
                                             widgetType={this.WIDGET_TYPE}
                                             configuration={{field: this.state.field, table_size: this.state.quickValuesOptions['table_size'], sort_order: this.state.quickValuesOptions['sort_order'], top_values: this.state.quickValuesOptions['top_values']}}
@@ -168,7 +172,7 @@ const FieldQuickValuesPlus = React.createClass({
                             <DropdownButton bsSize="small" className="quickvalues-settings" title="Customize" id="customize-quick-values-plus-dropdown" onToggle={() => this.toggleDropdown()} open={this.state.dropdownIsOpen} >
                                 {submenus}
                             </DropdownButton>
-                        </AddToDashboardMenu>
+                        </AddToDashboardMenuRev>
                     </div>
                     <h1>Quick Values for {this.state.field} {this.state.loadPending && <i
                         className="fa fa-spin fa-spinner"></i>}</h1>
