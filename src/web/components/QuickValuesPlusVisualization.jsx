@@ -5,7 +5,7 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
-
+import Reflux from 'reflux';
 import $ from 'jquery';
 global.jQuery = $;
 require('bootstrap/js/tooltip');
@@ -14,12 +14,15 @@ const D3Utils = require('util/D3Utils');
 const StringUtils = require('util/StringUtils');
 import NumberUtils from 'util/NumberUtils';
 
+import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 const SearchStore = StoreProvider.getStore('Search');
 import Routes from 'routing/Routes';
 
 const QuickValuesPlusVisualization = React.createClass({
+    mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
     propTypes: {
         id: PropTypes.string,
         config: PropTypes.object,
@@ -255,11 +258,13 @@ const QuickValuesPlusVisualization = React.createClass({
             columns.push((d) => this._getRemoveFromSearchButton(d.term));
         }
 
-        if (this.props.config.field) {
-            if (this.props.config.dashboardID) {
+        if (this.props.config.dashboardID) {
+            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
                 columns.push((d) => this._getExcludeFromQueryButton(d.term));
             }
+        }
 
+        if (this.props.config.field) {
             columns.push((d) => {
                 //Properly format strings containing spaces, backslashes and colons.
                 let escTerm = this.escape(`${d.term}`);
@@ -300,9 +305,10 @@ const QuickValuesPlusVisualization = React.createClass({
                         SearchStore.addSearchTerm("!" + this.props.id, term);
                     });
                     table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
-                        // noinspection Eslint
-                        const term = $(d3.event.target).closest('button').data('term');
-                        this._excludeQueryClick(term);
+                        if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+                            const term = $(d3.event.target).closest('button').data('term');
+                            this._excludeQueryClick(term);
+                        }
                     });
                 });
 
@@ -333,6 +339,7 @@ const QuickValuesPlusVisualization = React.createClass({
                     });
                     table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
                         // noinspection Eslint
+
                         const term = $(d3.event.target).closest('button').data('term');
                         this._excludeQueryClick(term);
                     });
@@ -515,6 +522,17 @@ const QuickValuesPlusVisualization = React.createClass({
             pieChart = <div ref="graph" className="quickvalues-graph"/>;
         }
 
+        let excludeQueryButton;
+        if (this.props.config.dashboardID) {
+            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+                excludeQueryButton = (
+                    <th style={{ width: 28 }}>&nbsp;</th>
+                );
+            } else {
+                excludeQueryButton = '';
+            }
+        }
+
         return (
             <div id={`visualization-${this.props.id}`} className="quickvalues-visualization"
                  style={{ height: this.props.height }}>
@@ -537,9 +555,7 @@ const QuickValuesPlusVisualization = React.createClass({
                             {this.props.displayRemoveFromSearchButton &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
-                            {this.props.config.dashboardID &&
-                            <th style={{ width: 28 }}>&nbsp;</th>
-                            }
+                            {excludeQueryButton}
                             {this.props.config.field &&
                             <th style={{ width: 28 }}>&nbsp;</th>
                             }
