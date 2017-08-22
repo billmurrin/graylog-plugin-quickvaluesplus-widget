@@ -10,6 +10,9 @@ import StringUtils from 'util/StringUtils';
 import UIUtils from 'util/UIUtils';
 import StoreProvider from 'injection/StoreProvider';
 import { QuickValuesPlusActions, QuickValuesPlusStore } from  'stores/QuickValuesPlusStore';
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
+import ActionsProvider from 'injection/ActionsProvider';
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import style from '!style/useable!css!./FieldQuickValuesPlus.css';
 
@@ -22,14 +25,15 @@ const FieldQuickValuesPlus = React.createClass({
     },
     mixins: [
         Reflux.connect(QuickValuesPlusStore),
-        Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')
+        Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
+        Reflux.connect(ConfigurationsStore)
     ],
     getInitialState() {
         return {
             field: undefined,
             dropdownIsOpen: false,
             data: [],
-            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}
+            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}
         };
     },
     style: style,
@@ -38,9 +42,10 @@ const FieldQuickValuesPlus = React.createClass({
     },
     componentWillMount() {
         this.setState({ dropdownIsOpen: false });
-        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 50, show_pie_chart: true, show_data_table: true}});
+        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}});
     },
     componentDidMount() {
+        ConfigurationActions.list("org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration");
         this.style.use();
         this._loadQuickValuesData();
     },
@@ -84,10 +89,14 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({field: field}, () => this._loadQuickValuesData(false));
     },
     _loadQuickValuesData() {
-        if (this.state.field !== undefined) {
-            this.setState({loadPending: true});
-            const promise = QuickValuesPlusActions.getQuickValues(this.state.field, 50, "descending");
-            promise.then((data) => this.setState({data: data, loadPending: false}));
+        if (this.state.configuration !== undefined) {
+            this.setState({quickValuesOptions: {top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values, sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order, table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size, show_pie_chart: true, show_data_table: true}});
+
+            if (this.state.field !== undefined) {
+                this.setState({loadPending: true});
+                const promise = QuickValuesPlusActions.getQuickValues(this.state.field, this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size, this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order);
+                promise.then((data) => this.setState({data: data, loadPending: false}));
+            }
         }
     },
     _resetStatus() {
@@ -126,7 +135,6 @@ const FieldQuickValuesPlus = React.createClass({
     render() {
         let content;
         let inner;
-        let myvalue;
 
         const submenus = [
             <li key="sort_order-submenu" className="dropdown-submenu left-submenu">
