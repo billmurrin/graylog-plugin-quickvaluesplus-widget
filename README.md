@@ -22,15 +22,17 @@ New Dashboard Features
 - Widgets now contain links so that you can drill into a Term search and view the results.
 - Widgets now contain a button to open the Term search inside of a new window.
 - Added Exclude Term from Query button - Negate a search term directly from the widget (Requires dashboard edit permissions)
-- Can now customize the field name used by the widget (Requires dashboard edit permissions)
+
 
 *NEW - Version 3 Dashboard Features*
-![alt text](http://i.imgur.com/viZ3AoK.png#left "Version 3 Dashboard Features")
+![alt text](http://i.imgur.com/viZ3AoK.png "Version 3 Dashboard Features")
+
+New Dashboard Congiguration Feature
+-----------
+- Can now customize the field name used by the widget (Requires dashboard edit permissions)
 
 *NEW - Version 3 Editable Field Name*
-![alt text](http://i.imgur.com/HmBs3YL.png#left "Editable Field Name")
-
-img[src*='#left']{ float: left; }
+![alt text](http://i.imgur.com/HmBs3YL.png "Editable Field Name")
 
 New Global System Configuration
 -----------
