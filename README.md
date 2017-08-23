@@ -32,7 +32,7 @@ New Dashboard Congiguration Feature
 
 
 *NEW - Version 3 Editable Field Name*
-![alt text](http://i.imgur.com/HmBs3YL.png "Edit Field Name")
+![alt text](http://i.imgur.com/Ezs7DL3.png "Edit Field Name")
 
 New Global System Configuration
 -----------
