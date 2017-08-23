@@ -7,6 +7,7 @@ import QuickValuesPlusVisualization from 'components/QuickValuesPlusVisualizatio
 import FieldQuickValuesPlus from 'components/FieldQuickValuesPlus';
 import QuickValuesPlusWidgetCreateConfiguration from 'components/QuickValuesPlusWidgetCreateConfiguration';
 import QuickValuesPlusWidgetEditConfiguration from 'components/QuickValuesPlusWidgetEditConfiguration'
+import QuickValuesPlusDefaultConfig from 'components/QuickValuesPlusDefaultConfig';
 
 PluginStore.register(new PluginManifest(packageJson, {
     widgets: [
@@ -26,6 +27,12 @@ PluginStore.register(new PluginManifest(packageJson, {
             displayName: 'Quick Values Plus',
             component: FieldQuickValuesPlus,
             displayPriority: 10,
+        },
+    ],
+    systemConfigurations: [
+        {
+            component: QuickValuesPlusDefaultConfig,
+            configType: 'org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration',
         },
     ],
 }));
