@@ -7,6 +7,7 @@ The QuickValuesPlus Widget is an enhancement to the Quick Values Widget that shi
 
 Several **NEW** features have been added to version 3.0.0 (See below). Version 3.0.0 is only compatible with Graylog 2.3.0 and above.
 
+
 Field Analyzer Features
 -----------
 - "Customize" menu supports modifying the Sort Order (Ascending or Descending), Table Size and number of Top Values displayed by the widget.
@@ -14,6 +15,7 @@ Field Analyzer Features
 
 *Field Analyzer Features* 
 ![alt text](http://i.imgur.com/H9SRkRo.png "Field Analyzer Features")
+
 
 New Dashboard Features
 -----------
@@ -23,11 +25,12 @@ New Dashboard Features
 - Can now customize the field name used by the widget (Requires dashboard edit permissions)
 
 *NEW - Version 3 Dashboard Features*
-![alt text](http://i.imgur.com/viZ3AoK.png "Version 3 Dashboard Features")
-
+![alt text](http://i.imgur.com/viZ3AoK.png#left "Version 3 Dashboard Features")
 
 *NEW - Version 3 Editable Field Name*
-![alt text](http://i.imgur.com/HmBs3YL.png "Editable Field Name")
+![alt text](http://i.imgur.com/HmBs3YL.png#left "Editable Field Name")
+
+img[src*='#left']{ float: left; }
 
 New Global System Configuration
 -----------
