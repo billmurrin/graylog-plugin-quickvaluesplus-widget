@@ -3,38 +3,49 @@
 [![GitHub Release](https://img.shields.io/github/release/billmurrin/graylog-plugin-quickvaluesplus-widget.svg)](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/releases)
 [![Build Status](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget.svg?branch=master)](https://travis-ci.org/billmurrin/graylog-plugin-quickvaluesplus-widget)
 
-The QuickValuesPlus Widget is an enhanced fork of the GrayLog2 Quick Values Widget that ships with GrayLog2.
+The QuickValuesPlus Widget is an enhancement to the Quick Values Widget that ships with GrayLog2. The QuickValuesPlus Widget can be added to a Stream as a Field Analyzer and to Dashboards as a widget. 
 
-When the QuickValuesPlus Widget is added to Search as a field analyzer it adds a "Remove from search" button. The button will negate the field in the search bar (E.g. !field_name:foo).
+Several **NEW** features have been added to version 3.0.0 (See below). Version 3.0.0 is only compatible with Graylog 2.3.0 and above.
 
-![alt text](http://i.imgur.com/uthGeG1.png "Remove From Search Button")
-
-In addition, the QuickValuesPlus Widget has extra features when added to dashboards, such as:
- * Support for **ascending** OR **descending** sort order in the datatable. Can now obtain true bottom values.
- * Editable number of Top/Bottom values (Quick Values default is 5). This is the one with a color in the table.
- * Customizable table size (Quick values default is 50).
-  
-![alt text](http://i.imgur.com/7PLDXCW.png "Example of Configuration Options")
-
-In version 2.1.0, the Customize menu was introduced to help control the sort order, number of top values and the table size of the plugin when used on a Search page.
-
-![alt text](http://i.imgur.com/TsZQxil.png "Example of Options Menu")
-
-Customize Menu Caveat
+Field Analyzer Features
 -----------
+- "Customize" menu supports modifying the Sort Order (Ascending or Descending), Table Size and number of Top Values displayed by the widget.
+- Exclude from search button - Add negated search directly to the Search Bar (E.g. !field_name:foo).
 
-Right now, Graylog's REST API does not support a sort option for the RelativeSearch lookup on /terms (See Issue #7). I plan on doing a Pull Request on Graylog to add this feature.
+*Field Analyzer Features* 
+![alt text](http://i.imgur.com/H9SRkRo.png "Field Analyzer Features")
 
-With that means is that, at this time, we cannot obtain a "TRUE" ascending order query on the Search pages. The ascending order is generic as the underlying Elasticsearch query is based on descending order. 
+New Dashboard Features
+-----------
+- Widgets now contain links so that you can drill into a Term search and view the results.
+- Widgets now contain a button to open the Term search inside of a new window.
+- Added Exclude Term from Query button - Negate a search term directly from the widget (Requires dashboard edit permissions)
+- Can now customize the field name used by the widget (Requires dashboard edit permissions)
 
-If you want a true ascending ordered, or Bottom-N, query, simply add the widget to a dashboard. The widget code does conduct a *TRUE* ascending ordered query. 
+*NEW - Version 3 Dashboard Features*
+![alt text](http://i.imgur.com/viZ3AoK.png "Version 3 Dashboard Features")
+
+*NEW - Version 3 Editable Field Name*
+![alt text](http://i.imgur.com/HmBs3YL.png "Editable Field Name")
+
+New Global System Configuration
+-----------
+- Can now Customize the Quick Values Plus default values in the System/Configuration page.
+
+*NEW - Version 3 Globally Configurable Default Values*
+![alt text](http://i.imgur.com/DZHbWzh.png "System Global Default Values")
 
 Supported Graylog Versions
 -----------
-* Version 2.1.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3
-* Version 1.0.0 was tested and is compatible with Graylog version 2.1.3. No Customize menu.
+* Version 3.0.0 was tested and is compatible with Graylog version 2.3.0 and above.
+* Version 2.1.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3.
+* Version 1.0.0 was tested and is compatible with Graylog version 2.1.3.
  
-Please file a bug report providing as much detail as possible if you find that the plugin is not working.
+Features and Bugs
+-----------
+If you come across a bug, require further assistance, or have a great feature request, please file an [Issue](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/issues) providing as much detail as possible. 
+
+Contributions to the code-base are greatly appreciated.
 
 Related Graylog Issues
 -----------
@@ -42,6 +53,8 @@ The following are Graylog issues that the QuickValuesPlus widget currently attem
 * [#2459](https://github.com/Graylog2/graylog2-server/issues/2459) - Reverse quick values/Bottom-N
 * [#2631](https://github.com/Graylog2/graylog2-server/issues/2631) - Feature request: rare values #2631
 * [#1684](https://github.com/Graylog2/graylog2-server/issues/1684) - Make number of terms in quick values widget configurable
+* [#3694](https://github.com/Graylog2/graylog2-server/issues/3694) - Add hyperlinks to "Quick Values" dashboard widgets
+* [#3394](https://github.com/Graylog2/graylog2-server/issues/3394) - Widgets has no way to edit all properties after creation
 
 Installation
 ------------
@@ -50,65 +63,41 @@ and place the `.jar` file in your Graylog plugin directory. The plugin directory
 
 Restart `graylog-server` and you are done.
 
-Way Ahead - Version 2.2.0
+Way Ahead - Version 3.1.0
 -----------
- * Add support to modify the field of the widget. (Issue #6)
- * Add HTML links to the dashboard (Issue #5)
- * Add code to make the Dropdown menu go away after a selection. (Issue #8)
- * Add a System Configuration menu to allow users to change the global defaults for sort order, top values, and table size. (Issue #9)
-
+ * Add additional Default Configuration options (show table, show pie chart, links, exclude query button)
+ * Add ability to Turn Off links and/or exclude from Query buttons for each individual widget in the Widget Configuration.
+  
 Development
 -----------
-You can improve your development experience for the web interface part of your plugin dramatically by making use of hot reloading. To do this, do the following:
+You can improve your development experience for the web interface part of your plugin dramatically by making use of hot reloading. 
 
-* `git clone https://github.com/Graylog2/graylog2-server.git`
-* `cd graylog2-server/graylog2-web-interface`
-* `ln -s $YOURPLUGIN plugin/`
-* `npm install && npm start`
+To hot reload using Graylog 2.3.0, your plugin directory should be located two directories above your graylog2-web-server directory (../../) and the folder name of your plugin should be begin with graylog-plugin (More info[HERE](https://github.com/Graylog2/graylog2-server/blob/2.3/graylog2-web-interface/webpack.combined.config.js#L11))
 
-If you run into issues with the current snapshot you can clone the 2.2.3 version of Graylog by using the following:
-
-`git clone -b "2.2.3" https://github.com/Graylog2/graylog2-server.git`
-
-**TIP** If you happen to use "[graylog-project](https://github.com/Graylog2/graylog-project)" and are having issues with the plugin compiling properly or not loading on the page, ensure your plugin's package.json has the same dependcies as "[graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)". The example below has a few additional packages (crossfilter, d3, dc, deep-equal and immutable).
-
+Steps for hot-loading setup with the plugin.
+* Clone the Repositories
 ```
- "dependencies": {
-    "reflux": "^0.2.12",
-    "crossfilter": "1.3.x",
-    "d3": "<=3.5.0",
-    "dc": "2.0.0-beta.19",
-    "deep-equal": "^1.0.1",
-    "immutable": "^3.7.5"
-  },
-  "devDependencies": {
-    "babel-core": "^6.0.0",
-    "babel-loader": "^6.0.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-polyfill": "^6.0.0",
-    "babel-preset-es2015": "^6.0.0",
-    "babel-preset-react": "^6.0.0",
-    "babel-preset-stage-0": "^6.0.0",
-    "clean-webpack-plugin": "^0.1.3",
-    "graylog-web-manifests": "^2.0.0-SNAPSHOT-1",
-    "graylog-web-plugin": "~0.0.21",
-    "json-loader": "^0.5.4",
-    "react": "^0.14.6",
-    "react-bootstrap": "^0.28.2",
-    "react-dom": "^0.14.6",
-    "react-hot-loader": "^3.0.0-beta.3",
-    "react-proxy-loader": "^0.3.4",
-    "webpack": "^1.12.2"
-  }
+git clone https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget.git
+git clone -b "2.3.0" https://github.com/Graylog2/graylog2-server.git
+```
+* Install the Node.JS modules
+```
+cd graylog-plugin-quickvaluesplus-widget
+npm install
+cd ../graylog2-server/graylog2-web-interface
+npm install
+```
+* Build the Vendor file (If you skip this, plugin might fail with an 'call an undefined function')
+```
+webpack --config webpack.vendor.js
+```
+* Start the web server
+```
+npm start
 ```
 
-Getting started
----------------
-
-This project is using Maven 3 and requires Java 8 or higher.
-
-* Clone this repository.
-* Run `mvn package` to build a JAR file.
-* Optional: Run `mvn jdeb:jdeb` and `mvn rpm:rpm` to create a DEB and RPM package respectively.
-* Copy generated JAR file in target directory to your Graylog plugin directory.
-* Restart the Graylog.
+Steps to build the plugin.
+* Follow the steps above, but **DO NOT** run the `npm start` command. (no need to start the dev web-server) 
+* Run `mvn package` 
+* Copy the generated JAR file located in the target directory to the Graylog plugin directory.
+* Restart Graylog
