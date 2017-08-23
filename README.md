@@ -25,6 +25,7 @@ New Dashboard Features
 *NEW - Version 3 Dashboard Features*
 ![alt text](http://i.imgur.com/viZ3AoK.png "Version 3 Dashboard Features")
 
+
 *NEW - Version 3 Editable Field Name*
 ![alt text](http://i.imgur.com/HmBs3YL.png "Editable Field Name")
 
