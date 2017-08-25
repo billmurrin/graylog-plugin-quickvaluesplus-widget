@@ -26,7 +26,7 @@ New Dashboard Features
 *NEW - Version 3 Dashboard Features*
 ![alt text](http://i.imgur.com/viZ3AoK.png "Version 3 Dashboard Features")
 
-New Dashboard Congiguration Feature
+New Dashboard Configuration Feature
 -----------
 - Can now customize the field name used by the widget (Requires dashboard edit permissions)
 
