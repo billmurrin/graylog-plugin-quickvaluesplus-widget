@@ -43,7 +43,7 @@ New Global System Configuration
 
 Supported Graylog Versions
 -----------
-* Version 3.0.0 was tested and is compatible with Graylog version 2.3.0 and above.
+* Version 3.0.1 was tested and is compatible with Graylog version 2.3.0 and above.
 * Version 2.1.0 was tested and is compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3.
 * Version 1.0.0 was tested and is compatible with Graylog version 2.1.3.
  
@@ -73,37 +73,40 @@ Way Ahead - Version 3.1.0
 -----------
  * Add additional Default Configuration options (show table, show pie chart, links, exclude query button)
  * Add ability to Turn Off links and/or exclude from Query buttons for each individual widget in the Widget Configuration.
-  
+ * Add debug configuration option to enable console messaging in order to help in troubleshooting issues with the plugin.
+   
 Development
 -----------
 You can improve your development experience for the web interface part of your plugin dramatically by making use of hot reloading. 
 
 To hot reload using Graylog 2.3.0, your plugin directory should be located two directories above your graylog2-web-server directory (../../) and the folder name of your plugin should be begin with graylog-plugin (More info[HERE](https://github.com/Graylog2/graylog2-server/blob/2.3/graylog2-web-interface/webpack.combined.config.js#L11))
 
-Steps for hot-loading setup with the plugin.
+#####Steps for hot-loading setup with the plugin.
 * Clone the Repositories
 ```
+git clone -b "2.3.1" https://github.com/Graylog2/graylog2-server.git
 git clone https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget.git
-git clone -b "2.3.0" https://github.com/Graylog2/graylog2-server.git
 ```
-* Install the Node.JS modules
+* Install the `graylog2-web-interface` node modules and build the Vendor Manifest
+```
+cd graylog2-server/graylog2-web-interface
+npm install
+webpack --config webpack.vendor.js
+```
+* Install the `graylog-plugin-quickvaluesplus-widget` node modules
 ```
 cd graylog-plugin-quickvaluesplus-widget
 npm install
-cd ../graylog2-server/graylog2-web-interface
-npm install
 ```
-* Build the Vendor file (If you skip this, plugin might fail with an 'call an undefined function')
+
+* From within `graylog2-web-interface`, start the web server
 ```
-webpack --config webpack.vendor.js
-```
-* Start the web server
-```
+cd graylog2-server/graylog2-web-interface
 npm start
 ```
 
-Steps to build the plugin.
-* Follow the steps above, but **DO NOT** run the `npm start` command. (no need to start the dev web-server) 
+#####Steps to build the plugin.
+* Follow the steps above for hot-loading, but **DO NOT** run the `npm start` command. (no need to start the dev web-server) 
 * Run `mvn package` 
-* Copy the generated JAR file located in the target directory to the Graylog plugin directory.
+* Copy the generated JAR file located in the `/target` folder to the Graylog plugin directory.
 * Restart Graylog
