@@ -33,6 +33,7 @@ const AddToDashboardMenuRev = React.createClass({
     return {
       dashboards: undefined,
       selectedDashboard: '',
+      saved: false,
     };
   },
 
@@ -124,6 +125,7 @@ const AddToDashboardMenuRev = React.createClass({
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
     const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
     promise.done(() => this.refs.widgetModal.saved());
+    this.setState({ saved: true });
   },
   _createNewDashboard() {
     this.refs.createDashboardModal.open();

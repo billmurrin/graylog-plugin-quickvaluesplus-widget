@@ -270,7 +270,7 @@ const QuickValuesPlusVisualization = React.createClass({
                 //Properly format strings containing spaces, backslashes and colons.
                 let escTerm = this.escape(`${d.term}`);
                 let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
-                let replayURL = Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
+                let replayURL = (this.props.config.stream_id == undefined) ? Routes.search(appendQuery, this._getTimeRange(), this.props.config.interval) : Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
                 return this._getTermReplyInNewWindowButton(replayURL);
             });
         }
