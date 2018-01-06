@@ -2,16 +2,24 @@ sudo: required
 dist: trusty
 language: java
 jdk:
-- oraclejdk8
+  - oraclejdk8
 install:
-- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dskip.web.build=true -B
-  -V
+  - npm install webpack -g
+  - pwd
+  - cd ../
+  - git clone -b "2.3.2" https://github.com/Graylog2/graylog2-server.git
+  - cd graylog2-server/graylog2-web-interface
+  - npm install
+  - webpack --config webpack.vendor.js
+  - pwd
+  - cd ../../graylog-plugin-quickvaluesplus-widget
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
-- mvn test -Dskip.web.build=true -B
+  - mvn test
 addons:
   apt:
     packages:
-    - rpm
+      - rpm
 before_deploy:
 - mvn jdeb:jdeb && export RELEASE_DEB_FILE=$(ls target/*.deb)
 - mvn rpm:rpm && export RELEASE_RPM_FILE=$(find target/ -name '*.rpm' | tail -1)
@@ -24,9 +32,9 @@ deploy:
     secure: e1lIcnvHdc3suR294QbSBKKH4bUewTZztslx1zA0wofFJwcYg76yrcbUIbrC6ZsrxVovVIJaeMIkgwYhaUfZaipq3/jolx8V3acYYUPNfoglamxWBinCoO85SmXQWnLjgEgt5B+HaRz/TK3BBhAifq5/jSwqUbmegkDnYLIxQ5BsRKKYIXeHQ55Mv+QEhofNSpexCS4t1OUByFPihUIyWcdsUvmMQ6SELiWW7ootFHexifU8usJ58BUSmmHmuItLxdF7CV8qA1HAc/sgroN+JHHznpSusfRb7eyO3RykqoAByYhk/K/cp5TtQwRzlBJCnMVkcsuDIYSjgQFFrHh4vg24sfq4fuxhLthYI6Lsff9/JhRf8kpNeSwV1UrkEf9BY3qtYsRI4VFCn9bvfloRxd+zos4PBkRPKYDWS/aKHplM2ElbVdRkiU5AvA3vcbupSbfYlznEfY2fZ7ehaWA3Y3ZvvmAAAUD0zU9aOg8EoKSdYdPiTPLYNCZnm5Mj3Ly6H56axW7jPmkhjt7dODLqcG2O/6QF+JncTd6o+QoGlF658jvfShwbxRKu3840NkofT7o0X6uZN9vZmzsFmOYwKcmItjyg/Yte0bXM4poklYMF+EmRD1yQoSvewXNylqM92zCHWCSqbJpeeEyNIRQwTXm+nICXbp0NxVcEU9FxAXM=
   file_glob: true
   file:
-    - "**/target/*.jar"
-    - "**/target/*.deb"
-    - "**/target/**/*.rpm"
+    - "${RELEASE_PKG_FILE}"
+    - "${RELEASE_DEB_FILE}"
+    - "${RELEASE_RPM_FILE}"
   skip_cleanup: true
   on:
     repo: billmurrin/graylog-plugin-quickvaluesplus-widget
