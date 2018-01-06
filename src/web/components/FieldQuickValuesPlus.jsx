@@ -60,6 +60,22 @@ const FieldQuickValuesPlus = React.createClass({
             const element = ReactDOM.findDOMNode(this);
             UIUtils.scrollToHint(element);
         }
+
+        if (this.refs.thedash !== undefined) {
+            if (this.refs.thedash.state.saved) {
+                this.refs.thedash.refs.widgetModal.setState({
+                    config: {
+                        top_values: this.state.quickValuesOptions['top_values'],
+                        sort_order: this.state.quickValuesOptions['sort_order'],
+                        table_size: this.state.quickValuesOptions['table_size'],
+                        show_pie_chart: true,
+                        show_data_table: true
+                    }
+                });
+                this.refs.thedash.setState({saved: false})
+            }
+        }
+
     },
 
     componentWillReceiveProps(nextProps) {
@@ -112,6 +128,15 @@ const FieldQuickValuesPlus = React.createClass({
                         show_data_table: true
                     },
                     loaded: true,
+                });
+                this.refs.thedash.refs.widgetModal.setState({
+                    config: {
+                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values,
+                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
+                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
+                        show_pie_chart: true,
+                        show_data_table: true
+                    }
                 });
             } else {
                 if (this.state.debug) console.log("Global config not loaded. QVP Options using internal default values.");

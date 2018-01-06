@@ -31,7 +31,7 @@ public class QuickValuesPlusWidgetMetaData implements PluginMetaData {
 
     @Override
     public URI getURL() {
-        return URI.create("https://github.com/https://github.com/billmurrin/graylog-plugin-quick-values-plus-widget");
+        return URI.create("https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget");
     }
 
     @Override
