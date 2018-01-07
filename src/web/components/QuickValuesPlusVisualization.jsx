@@ -45,6 +45,7 @@ const QuickValuesPlusVisualization = React.createClass({
         this.topValues = 5;
         this.dimension = this.quickValuesData.dimension((d) => d.term);
         this.group = this.dimension.group().reduceSum((d) => d.count);
+        this.currentConfig = {};
 
         return {
             total: undefined,
@@ -59,9 +60,37 @@ const QuickValuesPlusVisualization = React.createClass({
         } else {
             this.sortOrder = d3.ascending;
         }
+
+        if (this.props.config.dashboardID) {
+            this.setState({
+                currentConfig: {
+                    dashboardID: this.props.config.dashboardID,
+                    field: this.props.config.field,
+                    query: this.props.config.query,
+                    show_data_table: this.props.config.show_data_table,
+                    show_pie_chart: this.props.config.show_pie_chart,
+                    sort_order: this.props.config.sort_order,
+                    stream_id: this.props.config.stream_id,
+                    table_size: this.props.config.table_size,
+                    timerange: this.props.config.timerange,
+                    top_values: this.props.config.top_values,
+                }
+            });
+        } else {
+            this.setState({currentConfig: {
+                    show_data_table: this.props.config.show_data_table,
+                    show_pie_chart: this.props.config.show_pie_chart,
+                    sort_order: this.props.config.sort_order,
+                    table_size: this.props.config.table_size,
+                    top_values: this.props.config.top_values,
+                }
+            });
+        }
+
         this.tableChanged = false;
         this.tableSize =  this.props.config.table_size;
         this.topValues = this.props.config.top_values;
+
         this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
         this._formatProps(this.props);
         this._renderDataTable();
@@ -83,10 +112,38 @@ const QuickValuesPlusVisualization = React.createClass({
         this.tableChanged = true;
         this.tableSize =  nextProps.config.table_size;
         this.topValues = nextProps.config.top_values;
+
         this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
         this._formatProps(nextProps);
-        this._renderDataTable();
-        this._renderPieChart();
+
+        if (!deepEqual(this.state.currentConfig, nextProps.config)) {
+            if (this.props.config.dashboardID) {
+                this.setState({currentConfig: {
+                        dashboardID: nextProps.config.dashboardID,
+                        field: nextProps.config.field,
+                        query: nextProps.config.query,
+                        show_data_table: nextProps.config.show_data_table,
+                        show_pie_chart: nextProps.config.show_pie_chart,
+                        sort_order: nextProps.config.sort_order,
+                        stream_id: nextProps.config.stream_id,
+                        table_size: nextProps.config.table_size,
+                        timerange: nextProps.config.timerange,
+                        top_values: nextProps.config.top_values,
+                    }
+                });
+            } else {
+                this.setState({currentConfig: {
+                        show_data_table: nextProps.config.show_data_table,
+                        show_pie_chart: nextProps.config.show_pie_chart,
+                        sort_order: nextProps.config.sort_order,
+                        table_size: nextProps.config.table_size,
+                        top_values: nextProps.config.top_values,
+                    }
+                });
+            }
+            this._renderDataTable();
+            this._renderPieChart();
+        }
     },
     NUMBER_OF_TOP_VALUES: 10,
     DEFAULT_PIE_CHART_SIZE: 200,

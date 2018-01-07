@@ -129,15 +129,17 @@ const FieldQuickValuesPlus = React.createClass({
                     },
                     loaded: true,
                 });
-                this.refs.thedash.refs.widgetModal.setState({
-                    config: {
-                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values,
-                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
-                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
-                        show_pie_chart: true,
-                        show_data_table: true
-                    }
-                });
+                if (this.refs.thedash !== undefined) {
+                    this.refs.thedash.refs.widgetModal.setState({
+                        config: {
+                            top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values,
+                            sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
+                            table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
+                            show_pie_chart: true,
+                            show_data_table: true
+                        }
+                    });
+                }
             } else {
                 if (this.state.debug) console.log("Global config not loaded. QVP Options using internal default values.");
                 this.setState({
