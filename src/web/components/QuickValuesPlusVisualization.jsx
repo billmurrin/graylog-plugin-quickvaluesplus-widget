@@ -30,8 +30,6 @@ const QuickValuesPlusVisualization = React.createClass({
         height: PropTypes.any,
         horizontal: PropTypes.bool,
         displayAnalysisInformation: PropTypes.bool,
-        displayAddToSearchButton: PropTypes.bool,
-        displayRemoveFromSearchButton: PropTypes.bool,
     },
     getInitialState() {
         this.filters = [];
@@ -308,21 +306,21 @@ const QuickValuesPlusVisualization = React.createClass({
             (d) => NumberUtils.formatNumber(d.count),
         ];
 
-        if (this.props.displayAddToSearchButton) {
+        if (this.props.config.display_add_to_search_button == true ) {
             columns.push((d) => this._getAddToSearchButton(d.term));
         }
 
-        if (this.props.displayRemoveFromSearchButton) {
+        if (this.props.config.display_remove_from_search_button == true) {
             columns.push((d) => this._getRemoveFromSearchButton(d.term));
         }
 
         if (this.props.config.dashboardID) {
-            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
+            if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`]) && this.props.config.display_exclude_from_query_button) {
                 columns.push((d) => this._getExcludeFromQueryButton(d.term));
             }
         }
 
-        if (this.props.config.field) {
+        if (this.props.config.field && this.props.config.display_get_term_reply_in_new_window_button) {
             columns.push((d) => {
                 //Properly format strings containing spaces, backslashes and colons.
                 let escTerm = this.escape(`${d.term}`);
@@ -607,14 +605,15 @@ const QuickValuesPlusVisualization = React.createClass({
                           <th style={{ width: '50%' }}>Value</th>
                           <th style={{ alignItems: 'center' }}>%</th>
                           <th style={{ alignItems: 'center' }}>#</th>
-                            {this.props.displayAddToSearchButton &&
+                            {this.props.config.display_add_to_search_button &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
-                            {this.props.displayRemoveFromSearchButton &&
+                            {this.props.config.display_remove_from_search_button &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
-                            {excludeQueryButton}
-                            {this.props.config.field &&
+                            {this.props.config.display_exclude_from_query_button &&
+                            excludeQueryButton}
+                            {(this.props.config.field && this.props.config.display_get_term_reply_in_new_window_button) &&
                             <th style={{ width: 28 }}>&nbsp;</th>
                             }
                         </tr>

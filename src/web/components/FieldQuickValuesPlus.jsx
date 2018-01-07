@@ -35,8 +35,8 @@ const FieldQuickValuesPlus = React.createClass({
             dropdownIsOpen: false,
             loaded: false,
             data: [],
-            defaults: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true},
-            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}
+            defaults: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true, display_add_to_search_button: true, display_remove_from_search_button: true, display_exclude_from_query_button: true, display_get_term_reply_in_new_window_button: true},
+            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true, display_add_to_search_button: true, display_remove_from_search_button: true, display_exclude_from_query_button: true, display_get_term_reply_in_new_window_button: true}
         };
     },
     style: style,
@@ -46,7 +46,7 @@ const FieldQuickValuesPlus = React.createClass({
     componentWillMount() {
         if (this.state.debug) console.log("In componentWillMount");
         this.setState({ dropdownIsOpen: false });
-        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}});
+        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true, display_add_to_search_button: true, display_remove_from_search_button: true, display_exclude_from_query_button: true, display_get_term_reply_in_new_window_button: true}});
     },
 
     componentDidMount() {
@@ -125,7 +125,12 @@ const FieldQuickValuesPlus = React.createClass({
                         sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
                         table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
                         show_pie_chart: true,
-                        show_data_table: true
+                        show_data_table: true,
+                        display_add_to_search_button: true,
+                        display_remove_from_search_button: true,
+                        display_exclude_from_query_button: true,
+                        display_get_term_reply_in_new_window_button: true
+
                     },
                     loaded: true,
                 });
@@ -148,7 +153,12 @@ const FieldQuickValuesPlus = React.createClass({
                         sort_order: this.state.defaults.sort_order,
                         table_size: this.state.defaults.table_size,
                         show_pie_chart: true,
-                        show_data_table: true
+                        show_data_table: true,
+                        display_add_to_search_button: true,
+                        display_remove_from_search_button: true,
+                        display_exclude_from_query_button: true,
+                        display_get_term_reply_in_new_window_button: true
+
                     },
                 });
             }
@@ -233,8 +243,8 @@ const FieldQuickValuesPlus = React.createClass({
                                           data={this.state.data}
                                           horizontal
                                           displayAddToSearchButton
-                                          displayRemoveFromSearchButton
-                                          displayAnalysisInformation/>
+                                          displayRemoveFromSearchButton={this.state.quickValuesOptions.display_remove_from_search_button}
+                                          displayAnalysisInformation={this.state.quickValuesOptions.display_remove_from_search_button}/>
             );
         }
 
