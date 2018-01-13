@@ -30,13 +30,25 @@ public class QuickValuesPlusDefaultValuesMigration extends Migration {
     @Override
     @SuppressWarnings("unchecked")
     public void upgrade() {
-        if (clusterConfigService.get(QuickValuesPlusPluginConfiguration.class) != null) {
-            LOG.debug("Migration already done.");
-            return;
-        }
 
-        LOG.info("Writing values for Quick Values Plugin Configuration");
-        clusterConfigService.write(QuickValuesPlusPluginConfiguration.create(25, 5, "descending"));
+        final QuickValuesPlusPluginConfiguration quickValuesPlusPluginConfiguration = clusterConfigService.get(QuickValuesPlusPluginConfiguration.class);
+        final QuickValuesPlusPluginConfiguration3_1 quickValuesPlusPluginConfiguration3_1 = clusterConfigService.get(QuickValuesPlusPluginConfiguration3_1.class);
+
+        if (quickValuesPlusPluginConfiguration3_1 == null) {
+            if (quickValuesPlusPluginConfiguration == null) {
+                LOG.info("No Migration Found. Writing values for Quick Values Plugin Configuration");
+                clusterConfigService.write(QuickValuesPlusPluginConfiguration3_1.create(25, 5, "descending", true, true,true,true, true, true,"3.1.0"));
+            } else {
+                LOG.info("3.0 Migration Found. Updating to 3.1");
+                clusterConfigService.write(QuickValuesPlusPluginConfiguration3_1.create(quickValuesPlusPluginConfiguration.tableSize(), quickValuesPlusPluginConfiguration.topValues(), quickValuesPlusPluginConfiguration.sortOrder(), true, true, true, true, true,true, "3.1.0"));
+                LOG.info("Removing 3.0 migration information");
+                clusterConfigService.remove(QuickValuesPlusPluginConfiguration.class);
+            }
+        } else {
+            LOG.info("Migration has already completed. Exiting.");
+            return;
+
+        }
     }
 
 }

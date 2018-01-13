@@ -9,15 +9,16 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
 
   getInitialConfiguration() {
     return {
-      top_values: 5,
-      table_size: 50,
-      sort_order: 'descending',
-      show_pie_chart: true,
-      show_data_table: true,
-      display_add_to_search_button: true,
-      display_remove_from_search_button: true,
-      display_exclude_from_query_button: true,
-      display_get_term_reply_in_new_window_button: true,
+        top_values: 5,
+        table_size: 50,
+        sort_order: 'descending',
+        show_pie_chart: true,
+        show_data_table: true,
+        display_add_to_search_button: true,
+        display_remove_from_search_button: true,
+        display_term_hyperlinks: true,
+        display_exclude_from_query_button: true,
+        display_get_term_reply_in_new_window_button: true,
     };
   },
 
@@ -78,23 +79,14 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                onChange={this.props.onChange}
                help="Include a table with quantitative information." />
 
-        <Input key="displayAddToSearchButton"
-               type="checkbox"
-               id="quickvaluesplus-display-add-to-search-button"
-               name="display_add_to_search_button"
-               label="Display Add to Search Button"
-               checked={this.props.config.display_add_to_search_button}
-               onChange={this.props.onChange}
-               help="Column containing a add to search button." />
-
-        <Input key="displayRemoveFromSearchButton"
-               type="checkbox"
-               id="quickvaluesplus-display-remove-from-search-button"
-               name="display_remove_from_search_button"
-               label="Display Remove From Search Button"
-               checked={this.props.config.display_remove_from_search_button}
-               onChange={this.props.onChange}
-               help="Column containing a remove from search button." />
+          <Input key="displayTermHyperlinks"
+                 type="checkbox"
+                 id="quickvaluesplus-display-term_hyperlinks"
+                 name="display_term_hyperlinks"
+                 label="Display Term Hyperlinks"
+                 checked={this.props.config.display_term_hyperlinks}
+                 onChange={this.props.onChange}
+                 help="Turn off hyperlinks for the term." />
 
          <Input key="displayExludeFromQueryButton"
                type="checkbox"

@@ -22,13 +22,13 @@ public abstract class QuickValuesPlusPluginConfiguration {
 
     @JsonCreator
     public static QuickValuesPlusPluginConfiguration create(@JsonProperty("table_size") Number tableSize,
-                                                        @JsonProperty("top_values") Number topValues,
-                                                        @JsonProperty("sort_order") String sortOrder) {
+                                                            @JsonProperty("top_values") Number topValues,
+                                                            @JsonProperty("sort_order") String sortOrder) {
         return builder()
-                .tableSize(tableSize)
-                .topValues(topValues)
-                .sortOrder(sortOrder)
-                .build();
+            .tableSize(tableSize)
+            .topValues(topValues)
+            .sortOrder(sortOrder)
+            .build();
     }
 
     public static Builder builder() {

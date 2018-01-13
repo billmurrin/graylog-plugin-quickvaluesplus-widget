@@ -1,0 +1,12 @@
+#qvp .deflist dt {
+    width: 60%;
+}
+
+#qvp .qvp-conf-btn {
+    margin-top: 7px;
+}
+
+.qvp-config-modal div.radio {
+    margin-top: -3px;
+    margin-bottom: 15px;
+}

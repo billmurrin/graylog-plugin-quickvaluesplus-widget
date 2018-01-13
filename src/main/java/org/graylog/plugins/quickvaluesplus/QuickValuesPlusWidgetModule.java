@@ -3,10 +3,8 @@ package org.graylog.plugins.quickvaluesplus;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog.plugins.quickvaluesplus.widget.strategy.QuickValuesPlusWidgetStrategy;
-import com.github.joschi.jadconfig.Parameter;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.migrations.Migration;
-import org.graylog.plugins.quickvaluesplus.QuickValuesPlusDefaultValuesMigration;
 import java.util.Collections;
 import java.util.Set;
 
