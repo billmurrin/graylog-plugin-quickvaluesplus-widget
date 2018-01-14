@@ -75,6 +75,33 @@ const QuickValuesPlusWidgetEditConfiguration = React.createClass({
                defaultChecked={this.props.config.show_data_table}
                onChange={this.props.onChange}
                help="Include a table with quantitative information."/>
+
+          <Input key="displayTermHyperlinks"
+                 type="checkbox"
+                 id="quickvaluesplus-display-term_hyperlinks"
+                 name="display_term_hyperlinks"
+                 label="Display Term Hyperlinks"
+                 checked={this.props.config.display_term_hyperlinks}
+                 onChange={this.props.onChange}
+                 help="Turn off hyperlinks for the term." />
+
+        <Input key="displayExludeFromQueryButton"
+               type="checkbox"
+               id="quickvaluesplus-display-exclude-from-query-button"
+               name="display_exclude_from_query_button"
+               label="Display Exclude From Query Button"
+               checked={this.props.config.display_exclude_from_query_button}
+               onChange={this.props.onChange}
+               help="Column containing a exclude from Query button." />
+
+        <Input key="displayGetTermReplyInNewWindowButton"
+               type="checkbox"
+               id="quickvaluesplus-display-get-term-reply-in-new-window-button"
+               name="display_get_term_reply_in_new_window_button"
+               label="Display Get Term Reply In New Window Button"
+               checked={this.props.config.display_get_term_reply_in_new_window_button}
+               onChange={this.props.onChange}
+               help="Column containing a get term reply in new window button." />
       </fieldset>
     );
   },

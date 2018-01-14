@@ -30,13 +30,33 @@ const FieldQuickValuesPlus = React.createClass({
     ],
     getInitialState() {
         return {
-            debug: false,
             field: undefined,
             dropdownIsOpen: false,
             loaded: false,
             data: [],
-            defaults: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true},
-            quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}
+            defaults: {
+                top_values: 5,
+                sort_order: "descending",
+                table_size: 25,
+                show_pie_chart: true,
+                show_data_table: true,
+                display_add_to_search_button: true,
+                display_remove_from_search_button: true,
+                display_term_hyperlinks: true,
+                display_exclude_from_query_button: true,
+                display_get_term_reply_in_new_window_button: true
+            },
+            quickValuesOptions: {
+                top_values: 5,
+                sort_order: "descending",
+                table_size: 25,
+                show_pie_chart: true,
+                show_data_table: true,
+                display_add_to_search_button: true,
+                display_remove_from_search_button: true,
+                display_term_hyperlinks: true,
+                display_exclude_from_query_button: true,
+                display_get_term_reply_in_new_window_button: true}
         };
     },
     style: style,
@@ -44,14 +64,23 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({dropdownIsOpen: !this.state.dropdownIsOpen});
     },
     componentWillMount() {
-        if (this.state.debug) console.log("In componentWillMount");
         this.setState({ dropdownIsOpen: false });
-        this.setState({quickValuesOptions: {top_values: 5, sort_order: "descending", table_size: 25, show_pie_chart: true, show_data_table: true}});
+        this.setState({quickValuesOptions: {
+            top_values: 5,
+            sort_order: "descending",
+            table_size: 25,
+            show_pie_chart: true,
+            show_data_table: true,
+            display_add_to_search_button: true,
+            display_remove_from_search_button: true,
+            display_term_hyperlinks: true,
+            display_exclude_from_query_button: true,
+            display_get_term_reply_in_new_window_button: true}
+        });
     },
 
     componentDidMount() {
-        if (this.state.debug) console.log("In componentDidMount");
-        ConfigurationActions.list("org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration");
+        ConfigurationActions.list("org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1");
         this.style.use();
         this._loadQuickValuesData();
     },
@@ -90,7 +119,6 @@ const FieldQuickValuesPlus = React.createClass({
     },
 
     componentWillUnmount() {
-        if (this.state.debug) console.log("In componentWillUnmount");
         this.style.unuse();
         this._stopTimer();
     },
@@ -112,48 +140,55 @@ const FieldQuickValuesPlus = React.createClass({
         this.setState({field: field}, () => this._loadQuickValuesData(false));
     },
     _loadQuickValuesData() {
-        if (this.state.debug) console.log("Global Configuration value is");
-        if (this.state.debug) console.log(this.state.configuration);
-
-        if (this.state.debug) console.log("Is loaded: " + this.state.loaded);
         if (!this.state.loaded) {
             if (this.state.configuration !== undefined) {
-                if (this.state.debug) console.log("Global config loaded. QVP Options using global configuration settings.");
                 this.setState({
                     quickValuesOptions: {
-                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values,
-                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
-                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
-                        show_pie_chart: true,
-                        show_data_table: true
+                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].top_values,
+                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].sort_order,
+                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].table_size,
+                        show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].show_pie_chart,
+                        show_data_table: true,
+                        display_add_to_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_add_to_search_button,
+                        display_remove_from_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_remove_from_search_button,
+                        display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_term_hyperlinks,
+                        display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_exclude_from_query_button,
+                        display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_get_term_reply_in_new_window_button
                     },
                     loaded: true,
                 });
-                this.refs.thedash.refs.widgetModal.setState({
-                    config: {
-                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].top_values,
-                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].sort_order,
-                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration'].table_size,
-                        show_pie_chart: true,
-                        show_data_table: true
-                    }
-                });
+                if (this.refs.thedash !== undefined) {
+                    this.refs.thedash.refs.widgetModal.setState({
+                        config: {
+                            top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].top_values,
+                            sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].sort_order,
+                            table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].table_size,
+                            show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].show_pie_chart,
+                            show_data_table: true,
+                            display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_term_hyperlinks,
+                            display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_exclude_from_query_button,
+                            display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_get_term_reply_in_new_window_button
+                        }
+                    });
+                }
             } else {
-                if (this.state.debug) console.log("Global config not loaded. QVP Options using internal default values.");
                 this.setState({
                     quickValuesOptions: {
                         top_values: this.state.defaults.top_values,
                         sort_order: this.state.defaults.sort_order,
                         table_size: this.state.defaults.table_size,
-                        show_pie_chart: true,
-                        show_data_table: true
+                        show_pie_chart: this.state.defaults.show_pie_chart,
+                        show_data_table: true,
+                        display_add_to_search_button: this.state.defaults.display_add_to_search_button,
+                        display_remove_from_search_button: this.state.defaults.display_remove_from_search_button,
+                        display_term_hyperlinks: this.state.defaults.display_term_hyperlinks,
+                        display_exclude_from_query_button: this.state.defaults.display_exclude_from_query_button,
+                        display_get_term_reply_in_new_window_button: this.state.defaults.display_get_term_reply_in_new_window_button
+
                     },
                 });
             }
         }
-
-        if (this.state.debug) console.log("QVP Options - _loadQuickValuesData");
-        if (this.state.debug) console.log(this.state.quickValuesOptions);
 
         if (this.state.field !== undefined) {
             this.setState({loadPending: true});
@@ -165,10 +200,7 @@ const FieldQuickValuesPlus = React.createClass({
         }
     },
     _resetStatus() {
-        if (this.state.debug) console.log("In resetStatus method. Get Initial State");
         this.setState(this.getInitialState());
-        if (this.state.debug) console.log("QVP Options - _resetStatus");
-        if (this.state.debug) console.log(this.state.quickValuesOptions);
     },
     sortordermenu: ['ascending', 'descending'],
     topvaluesmenu: [5,10,15,20,25],
@@ -178,12 +210,9 @@ const FieldQuickValuesPlus = React.createClass({
         return this.state.quickValuesOptions[configKey] === value ? 'selected' : '';
     },
     _updateOptionState(configKey, value) {
-        if (this.state.debug) console.log("In _updateOptionState method. Updating Options");
         let newOptions = Object.assign({}, this.state.quickValuesOptions, {[configKey]: value});
         this.refs.thedash.refs.widgetModal.setState({config: newOptions});
         this.setState({quickValuesOptions: newOptions});
-        if (this.state.debug) console.log("QVP Options - _updateOptionState");
-        if (this.state.debug) console.log(this.state.quickValuesOptions);
         const promise = QuickValuesPlusActions.getQuickValues(this.state.field, newOptions['table_size'], newOptions['sort_order']);
         promise.then((data) => this.setState({data: data, loadPending: false}));
     },
@@ -230,8 +259,8 @@ const FieldQuickValuesPlus = React.createClass({
                                           config={this.state.quickValuesOptions}
                                           data={this.state.data}
                                           horizontal
-                                          displayAddToSearchButton
-                                          displayRemoveFromSearchButton
+                                          displayAddToSearchButton={this.state.quickValuesOptions.display_add_to_search_button}
+                                          displayRemoveFromSearchButton={this.state.quickValuesOptions.display_remove_from_search_button}
                                           displayAnalysisInformation/>
             );
         }

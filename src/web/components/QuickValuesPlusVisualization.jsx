@@ -29,9 +29,15 @@ const QuickValuesPlusVisualization = React.createClass({
         widget: PropTypes.object,
         height: PropTypes.any,
         horizontal: PropTypes.bool,
-        displayAnalysisInformation: PropTypes.bool,
         displayAddToSearchButton: PropTypes.bool,
         displayRemoveFromSearchButton: PropTypes.bool,
+        displayAnalysisInformation: PropTypes.bool,
+    },
+    getDefaultProps() {
+        return {
+            displayAddToSearchButton: false,
+            displayRemoveFromSearchButton: false,
+        }
     },
     getInitialState() {
         this.filters = [];
@@ -45,6 +51,8 @@ const QuickValuesPlusVisualization = React.createClass({
         this.topValues = 5;
         this.dimension = this.quickValuesData.dimension((d) => d.term);
         this.group = this.dimension.group().reduceSum((d) => d.count);
+        this.exclude_search_hidden = false;
+        this.new_window_hidden = false;
 
         return {
             total: undefined,
@@ -54,14 +62,54 @@ const QuickValuesPlusVisualization = React.createClass({
         };
     },
     componentDidMount() {
+        if (this.props.config.dashboardID) {
+            this.setState({
+                currentConfig: {
+                    dashboardID: this.props.config.dashboardID,
+                    field: this.props.config.field,
+                    query: this.props.config.query,
+                    show_data_table: this.props.config.show_data_table,
+                    show_pie_chart: this.props.config.show_pie_chart,
+                    sort_order: this.props.config.sort_order,
+                    stream_id: this.props.config.stream_id,
+                    table_size: this.props.config.table_size,
+                    timerange: this.props.config.timerange,
+                    top_values: this.props.config.top_values,
+                    display_term_hyperlinks: this.props.config.display_term_hyperlinks,
+                    display_exclude_from_query_button: this.props.config.display_exclude_from_query_button,
+                    display_get_term_reply_in_new_window_button: this.props.config.display_get_term_reply_in_new_window_button
+                }
+            });
+
+            this.setState({exclude_search_hidden: this.props.config.display_exclude_from_query_button});
+            this.setState({new_window_hidden: this.props.config.display_get_term_reply_in_new_window_button});
+        } else {
+            this.setState({
+                currentConfig: {
+                    show_data_table: this.props.config.show_data_table,
+                    show_pie_chart: this.props.config.show_pie_chart,
+                    sort_order: this.props.config.sort_order,
+                    table_size: this.props.config.table_size,
+                    top_values: this.props.config.top_values,
+                    display_add_to_search_button: this.props.config.display_add_to_search_button,
+                    display_remove_from_search_button: this.props.config.display_remove_from_search_button,
+                    display_term_hyperlinks: this.props.config.display_term_hyperlinks,
+                    display_exclude_from_query_button: this.props.config.display_exclude_from_query_button,
+                    display_get_term_reply_in_new_window_button: this.props.config.display_get_term_reply_in_new_window_button,
+                }
+            });
+        }
+
         if (this.props.config.sort_order === "descending") {
             this.sortOrder = d3.descending;
         } else {
             this.sortOrder = d3.ascending;
         }
+
         this.tableChanged = false;
         this.tableSize =  this.props.config.table_size;
         this.topValues = this.props.config.top_values;
+
         this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
         this._formatProps(this.props);
         this._renderDataTable();
@@ -83,10 +131,49 @@ const QuickValuesPlusVisualization = React.createClass({
         this.tableChanged = true;
         this.tableSize =  nextProps.config.table_size;
         this.topValues = nextProps.config.top_values;
+        this.setState({exclude_search_hidden: nextProps.config.display_exclude_from_query_button});
         this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
         this._formatProps(nextProps);
-        this._renderDataTable();
-        this._renderPieChart();
+
+        if (!deepEqual(this.state.currentConfig, nextProps.config)) {
+            if (this.props.config.dashboardID) {
+                this.setState({currentConfig: {
+                        dashboardID: nextProps.config.dashboardID,
+                        field: nextProps.config.field,
+                        query: nextProps.config.query,
+                        show_data_table: nextProps.config.show_data_table,
+                        show_pie_chart: nextProps.config.show_pie_chart,
+                        sort_order: nextProps.config.sort_order,
+                        stream_id: nextProps.config.stream_id,
+                        table_size: nextProps.config.table_size,
+                        timerange: nextProps.config.timerange,
+                        top_values: nextProps.config.top_values,
+                        display_term_hyperlinks: nextProps.config.display_term_hyperlinks,
+                        display_exclude_from_query_button: nextProps.config.display_exclude_from_query_button,
+                        display_get_term_reply_in_new_window_button: nextProps.config.display_get_term_reply_in_new_window_button
+                    }
+                });
+                this.setState({exclude_search_hidden: nextProps.config.display_exclude_from_query_button});
+                this.setState({new_window_hidden: nextProps.config.display_get_term_reply_in_new_window_button});
+            } else {
+                this.setState({currentConfig: {
+                        show_data_table: nextProps.config.show_data_table,
+                        show_pie_chart: nextProps.config.show_pie_chart,
+                        sort_order: nextProps.config.sort_order,
+                        table_size: nextProps.config.table_size,
+                        top_values: nextProps.config.top_values,
+                        display_add_to_search_button: nextProps.config.display_add_to_search_button,
+                        display_remove_from_search_button: nextProps.config.display_remove_from_search_button,
+                        display_term_hyperlinks: nextProps.config.display_term_hyperlinks,
+                        display_exclude_from_query_button: nextProps.config.display_exclude_from_query_button,
+                        display_get_term_reply_in_new_window_button: nextProps.config.display_get_term_reply_in_new_window_button,
+                    }
+                });
+            }
+
+            this._renderDataTable();
+            this._renderPieChart();
+        }
     },
     NUMBER_OF_TOP_VALUES: 10,
     DEFAULT_PIE_CHART_SIZE: 200,
@@ -230,14 +317,13 @@ const QuickValuesPlusVisualization = React.createClass({
                     colourBadge = `<span class="datatable-badge" style="background-color: ${colour}"></span>`;
                 }
 
-                if (this.props.config.field) {
+                if (this.props.config.field && this.props.config.display_term_hyperlinks) {
                     //Properly format strings containing spaces, backslashes and colons.
                     let escTerm = this.escape(`${d.term}`);
                     let appendQuery = (this.props.config.query == "") ? this.props.config.field + ":" + escTerm : this.props.config.query + " AND " + this.props.config.field + ":" + escTerm;
                     let replayURL = (this.props.config.stream_id == undefined) ? Routes.search(appendQuery, this._getTimeRange(), this.props.config.interval) : Routes.stream_search(this.props.config.stream_id, appendQuery, this._getTimeRange(), this.props.config.interval);
 
                     return `${colourBadge} <a href="${replayURL}">${d.term}</a>`;
-
                 }
                 else
                 {
@@ -251,21 +337,19 @@ const QuickValuesPlusVisualization = React.createClass({
             (d) => NumberUtils.formatNumber(d.count),
         ];
 
-        if (this.props.displayAddToSearchButton) {
-            columns.push((d) => this._getAddToSearchButton(d.term));
-        }
+        if (!this.props.config.dashboardID) {
+            if (this.props.config.display_add_to_search_button) {
+                columns.push((d) => this._getAddToSearchButton(d.term));
+            }
 
-        if (this.props.displayRemoveFromSearchButton) {
-            columns.push((d) => this._getRemoveFromSearchButton(d.term));
-        }
-
-        if (this.props.config.dashboardID) {
+            if (this.props.config.display_remove_from_search_button) {
+                columns.push((d) => this._getRemoveFromSearchButton(d.term));
+            }
+        } else {
             if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
                 columns.push((d) => this._getExcludeFromQueryButton(d.term));
             }
-        }
 
-        if (this.props.config.field) {
             columns.push((d) => {
                 //Properly format strings containing spaces, backslashes and colons.
                 let escTerm = this.escape(`${d.term}`);
@@ -280,6 +364,7 @@ const QuickValuesPlusVisualization = React.createClass({
         const tableDomNode = this.refs.table;
 
         this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
+
         if (this.sortOrder == d3.descending){
             const descGroup = this._getTop(this.group);
             this.dataTable
@@ -300,11 +385,24 @@ const QuickValuesPlusVisualization = React.createClass({
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm(this.props.id, term);
                     });
+
                     table.selectAll('td.dc-table-column button#removeSearchTerm').on('click', () => {
                         // noinspection Eslint
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm("!" + this.props.id, term);
                     });
+
+                    if (this.props.config.dashboardID) {
+                        let query_hidden = this.state.exclude_search_hidden ? null : 'none';
+                        table.selectAll('td.dc-table-column._3').style("display", function(x){
+                            return query_hidden;
+                        });
+
+                        let new_window_hidden = this.state.new_window_hidden ? null : 'none';
+                        table.selectAll('td.dc-table-column._4').style("display", function(x){
+                            return new_window_hidden;
+                        });
+                    }
                     table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
                         if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
                             const term = $(d3.event.target).closest('button').data('term');
@@ -333,14 +431,27 @@ const QuickValuesPlusVisualization = React.createClass({
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm(this.props.id, term);
                     });
+
                     table.selectAll('td.dc-table-column button#removeSearchTerm').on('click', () => {
                         // noinspection Eslint
                         const term = $(d3.event.target).closest('button').data('term');
                         SearchStore.addSearchTerm("!" + this.props.id, term);
                     });
+
+                    if (this.props.config.dashboardID) {
+                        let query_hidden = this.state.exclude_search_hidden ? null : 'none';
+                        table.selectAll('td.dc-table-column._3').style("display", function(x){
+                            return query_hidden;
+                        });
+
+                        let new_window_hidden = this.state.new_window_hidden ? null : 'none';
+                        table.selectAll('td.dc-table-column._4').style("display", function(x){
+                            return new_window_hidden;
+                        });
+                    }
+
                     table.selectAll('td.dc-table-column button#excludeTermFromQuery').on('click', () => {
                         // noinspection Eslint
-
                         const term = $(d3.event.target).closest('button').data('term');
                         this._excludeQueryClick(term);
                     });
@@ -499,7 +610,11 @@ const QuickValuesPlusVisualization = React.createClass({
        * Ensure we always render the data table when quickvalues config was created before introducing pie charts,
        * or when neither the data table or the pie chart are selected for rendering.
        */
-        if (this.props.config.show_data_table || !this.props.config.show_pie_chart) {
+        if (!this.props.config.show_pie_chart) {
+            dataTableClassName = 'col-md-12';
+        } else if (this.props.config.show_pie_chart && !this.props.config.show_data_table) {
+            dataTableClassName = 'hidden';
+        } else if(this.props.config.show_pie_chart && this.props.config.show_data_table) {
             dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
         } else {
             dataTableClassName = 'hidden';
@@ -527,7 +642,7 @@ const QuickValuesPlusVisualization = React.createClass({
         if (this.props.config.dashboardID) {
             if (this.isPermitted(this.state.currentUser.permissions, [`dashboards:edit:${this.props.config.dashboardID}`])) {
                 excludeQueryButton = (
-                    <th style={{ width: 28 }}>&nbsp;</th>
+                    <th style={{ width: 27 }}>&nbsp;</th>
                 );
             } else {
                 excludeQueryButton = '';
@@ -547,18 +662,19 @@ const QuickValuesPlusVisualization = React.createClass({
                       <table ref="table" className="table table-condensed table-hover">
                         <thead>
                         <tr>
-                          <th style={{ width: '50%' }}>Value</th>
-                          <th style={{ alignItems: 'center' }}>%</th>
-                          <th style={{ alignItems: 'center' }}>#</th>
-                            {this.props.displayAddToSearchButton &&
+                          <th style={{ width: 'auto' }}>Value</th>
+                          <th style={{ width: 58, alignItems: 'center' }}>%</th>
+                          <th style={{ width: 50, alignItems: 'center' }}>#</th>
+                            {!this.props.config.dashboardID && this.props.config.display_add_to_search_button &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
-                            {this.props.displayRemoveFromSearchButton &&
+                            {!this.props.config.dashboardID && this.props.config.display_remove_from_search_button &&
                             <th style={{ width: 30 }}>&nbsp;</th>
                             }
-                            {excludeQueryButton}
-                            {this.props.config.field &&
-                            <th style={{ width: 28 }}>&nbsp;</th>
+                            {this.props.config.dashboardID && this.state.exclude_search_hidden &&
+                            excludeQueryButton}
+                            {this.props.config.dashboardID && this.props.config.field && this.state.new_window_hidden &&
+                            <th style={{ width: 27 }}>&nbsp;</th>
                             }
                         </tr>
                         </thead>

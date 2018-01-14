@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+ import React, {PropTypes} from 'react';
 import { Input } from 'components/bootstrap';
 
 const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
@@ -9,11 +9,16 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
 
   getInitialConfiguration() {
     return {
-      top_values: 5,
-      table_size: 50,
-      sort_order: 'descending',
-      show_pie_chart: true,
-      show_data_table: true,
+        top_values: 5,
+        table_size: 50,
+        sort_order: 'descending',
+        show_pie_chart: true,
+        show_data_table: true,
+        display_add_to_search_button: true,
+        display_remove_from_search_button: true,
+        display_term_hyperlinks: true,
+        display_exclude_from_query_button: true,
+        display_get_term_reply_in_new_window_button: true,
     };
   },
 
@@ -38,7 +43,7 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                onChange={this.props.onChange}
                help="Modify the number of results in the table."/>
 
-          <label for="quickvaluesplus-sort-order-descending" class="control-label"><span>Sort Order</span></label>
+             <label for="quickvaluesplus-sort-order-descending" className="control-label"><span>Sort Order</span></label>
           <div className="radio">
               <label>
                   <input key="dataSortOrderDesc"  id="quickvaluesplus-sort-order-descending" type="radio" name="sort_order" value="descending"
@@ -73,6 +78,33 @@ const QuickValuesPlusWidgetCreateConfiguration = React.createClass({
                checked={this.props.config.show_data_table}
                onChange={this.props.onChange}
                help="Include a table with quantitative information." />
+
+          <Input key="displayTermHyperlinks"
+                 type="checkbox"
+                 id="quickvaluesplus-display-term_hyperlinks"
+                 name="display_term_hyperlinks"
+                 label="Display Term Hyperlinks"
+                 checked={this.props.config.display_term_hyperlinks}
+                 onChange={this.props.onChange}
+                 help="Turn off hyperlinks for the term." />
+
+         <Input key="displayExludeFromQueryButton"
+               type="checkbox"
+               id="quickvaluesplus-display-exclude-from-query-button"
+               name="display_exclude_from_query_button"
+               label="Display Exclude From Query Button"
+               checked={this.props.config.display_exclude_from_query_button}
+               onChange={this.props.onChange}
+               help="Column containing a exclude from Query button." />
+
+         <Input key="displayGetTermReplyInNewWindowButton"
+               type="checkbox"
+               id="quickvaluesplus-display-get-term-reply-in-new-window-button"
+               name="display_get_term_reply_in_new_window_button"
+               label="Display Get Term Reply In New Window Button"
+               checked={this.props.config.display_get_term_reply_in_new_window_button}
+               onChange={this.props.onChange}
+               help="Column containing a get term reply in new window button." />
       </fieldset>
     );
   },
