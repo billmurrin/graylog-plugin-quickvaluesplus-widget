@@ -34,7 +34,16 @@ export const QuickValuesPlusStore = Reflux.createStore({
                 timerange['keyword'] = originalSearchURLParams.get('keyword');
                 break;
         }
-        let url = ApiRoutes.UniversalSearchApiController.fieldTerms(rangeType, originalSearchURLParams.get('q') || '*', field, timerange, streamId).url;
+        let url = ApiRoutes.UniversalSearchApiController.fieldTerms(
+            rangeType,
+            originalSearchURLParams.get('q') || '*',
+            field,
+            field + ":" + sort_order,
+            tableSize,
+            '',
+            timerange,
+            undefined,
+            streamId).url;
         url = URLUtils.qualifyUrl(url);
 
         // If it was set, append the optional Size parameter to the query.

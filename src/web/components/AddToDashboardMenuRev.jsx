@@ -1,214 +1,216 @@
-import React, { PropTypes } from 'react';
-import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import React from 'react';
+import Reflux from 'reflux';
+import { ButtonGroup, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import { WidgetCreationModal } from 'components/widgets';
 import { EditDashboardModal } from 'components/dashboard';
 
-const AddToDashboardMenuRev = React.createClass({
-  propTypes: {
-    widgetType: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-    bsStyle: PropTypes.string,
-    configuration: PropTypes.object,
-    fields: PropTypes.array,
-    hidden: PropTypes.bool,
-    pullRight: PropTypes.bool,
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]),
-  },
+import style from './AddToDashboardMenu.css';
 
-  mixins: [PermissionsMixin],
+const AddToDashboardMenu = React.createClass({
+    propTypes: {
+        widgetType: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+        bsStyle: PropTypes.string,
+        configuration: PropTypes.object,
+        fields: PropTypes.array,
+        hidden: PropTypes.bool,
+        pullRight: PropTypes.bool,
+        appendMenus: PropTypes.oneOfType([
+            PropTypes.arrayOf(PropTypes.element),
+            PropTypes.element,
+        ]),
+        children: PropTypes.oneOfType([
+            PropTypes.arrayOf(PropTypes.element),
+            PropTypes.element,
+        ]),
+    },
 
-  getInitialState() {
-    return {
-      dashboards: undefined,
-      selectedDashboard: '',
-      saved: false,
-    };
-  },
+    mixins: [Reflux.connect(DashboardsStore), PermissionsMixin],
 
-  getDefaultProps() {
-    return {
-      bsStyle: 'info',
-      configuration: {},
-      hidden: false,
-      pullRight: false,
-    };
-  },
+    getInitialState() {
+        return {
+            selectedDashboard: '',
+            loading: false,
+        };
+    },
 
-  componentDidMount() {
-    this._initializeDashboards();
-  },
-  _initializeDashboards() {
-    DashboardsStore.addOnWritableDashboardsChangedCallback((dashboards) => {
-      if (this.isMounted()) {
-        this._updateDashboards(dashboards);
-      }
-    });
+    getDefaultProps() {
+        return {
+            bsStyle: 'default',
+            configuration: {},
+            hidden: false,
+            pullRight: false,
+        };
+    },
 
-    const dashboards = DashboardsStore.writableDashboards;
-    // Trigger a dashboard update if the store haven't got any dashboards
-    if (dashboards.size === 0) {
-      DashboardsStore.updateWritableDashboards();
-      return;
-    }
+    _selectDashboard(dashboardId) {
+        this.setState({ selectedDashboard: dashboardId });
+        this.refs.widgetModal.open();
+    },
+    _saveWidget(title, configuration) {
 
-    this._updateDashboards(dashboards);
-  },
-  _updateDashboards(newDashboards) {
-    this.setState({ dashboards: newDashboards });
-  },
-  _selectDashboard(dashboardId) {
-    let config = this.props.configuration;
-    config.dashboardID = dashboardId;
+        configuration['dashboardID'] = this.state.selectedDashboard;
 
-    this.setState({ selectedDashboard: dashboardId });
-    this.refs.widgetModal.open();
-  },
-  _saveWidget(title, configuration) {
+        let widgetConfig = Immutable.Map(this.props.configuration);
+        let searchParams = Immutable.Map(SearchStore.getOriginalSearchParams());
+        if (searchParams.has('range_type')) {
+            switch (searchParams.get('range_type')) {
+                case 'relative':
+                    const relativeTimeRange = Immutable.Map({
+                        // Changes the "relative" key used to store relative time-range to "range"
+                        range: searchParams.get('relative'),
+                        type: 'relative',
+                    });
+                    searchParams = searchParams
+                        .set('timerange', relativeTimeRange)
+                        .delete('relative')
+                        .delete('range_type');
+                    break;
+                case 'absolute':
+                    const from = searchParams.get('from');
+                    const to = searchParams.get('to');
+                    const absoluteTimeRange = Immutable.Map({
+                        type: 'absolute',
+                        from: from,
+                        to: to,
+                    });
+                    searchParams = searchParams
+                        .set('timerange', absoluteTimeRange)
+                        .delete('from')
+                        .delete('to')
+                        .delete('range_type');
+                    break;
+                case 'keyword':
+                    const keywordTimeRange = Immutable.Map({
+                        type: 'keyword',
+                        keyword: searchParams.get('keyword'),
+                    });
+                    searchParams = searchParams
+                        .set('timerange', keywordTimeRange)
+                        .delete('keyword')
+                        .delete('range_type');
+            }
+        }
+        // Stores stream ID with the right key name for the add widget request
+        if (searchParams.has('streamId')) {
+            searchParams = searchParams.set('stream_id', searchParams.get('streamId')).delete('streamId');
+        }
 
-    configuration['dashboardID'] = this.state.selectedDashboard;
-    let widgetConfig = Immutable.Map(this.props.configuration);
-    let searchParams = Immutable.Map(SearchStore.getOriginalSearchParams());
-    if (searchParams.has('range_type')) {
-      switch (searchParams.get('range_type')) {
-        case 'relative':
-          const relativeTimeRange = Immutable.Map({
-            // Changes the "relative" key used to store relative time-range to "range"
-            range: searchParams.get('relative'),
-            type: 'relative',
-          });
-          searchParams = searchParams
-            .set('timerange', relativeTimeRange)
-            .delete('relative')
-            .delete('range_type');
-          break;
-        case 'absolute':
-          const from = searchParams.get('from');
-          const to = searchParams.get('to');
-          const absoluteTimeRange = Immutable.Map({
-            type: 'absolute',
-            from: from,
-            to: to,
-          });
-          searchParams = searchParams
-            .set('timerange', absoluteTimeRange)
-            .delete('from')
-            .delete('to')
-            .delete('range_type');
-          break;
-        case 'keyword':
-          const keywordTimeRange = Immutable.Map({
-            type: 'keyword',
-            keyword: searchParams.get('keyword'),
-          });
-          searchParams = searchParams
-            .set('timerange', keywordTimeRange)
-            .delete('keyword')
-            .delete('range_type');
-      }
-    }
-    // Stores stream ID with the right key name for the add widget request
-    if (searchParams.has('streamId')) {
-      searchParams = searchParams.set('stream_id', searchParams.get('streamId')).delete('streamId');
-    }
-    widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
-    const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
-    promise.done(() => this.refs.widgetModal.saved());
-    this.setState({ saved: true });
-  },
-  _createNewDashboard() {
-    this.refs.createDashboardModal.open();
-  },
-  _renderLoadingDashboardsMenu() {
-    return (
-      <DropdownButton bsStyle={this.props.bsStyle}
-                      bsSize="small"
-                      title={this.props.title}
-                      pullRight={this.props.pullRight}
-                      id="dashboard-selector-dropdown">
-        <MenuItem disabled>Loading dashboards...</MenuItem>
-      </DropdownButton>
-    );
-  },
-  _renderDashboardMenu() {
-    let dashboards = Immutable.List();
+        if (widgetConfig.has('series')) {
+            // If widget has several series, each of them will contain a query, delete it from global widget configuration.
+            searchParams = searchParams.delete('query');
+        }
 
-    this.state.dashboards
-      .sortBy(dashboard => dashboard.title)
-      .forEach((dashboard, id) => {
-        dashboards = dashboards.push(
-          <MenuItem eventKey={id} key={dashboard.id}>
-            {dashboard.title}
-          </MenuItem>,
+        widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
+
+        this.setState({ loading: true });
+        const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
+        promise
+            .then(() => this.refs.widgetModal.saved())
+            .finally(() => this.setState({ loading: false }));
+    },
+    _createNewDashboard() {
+        this.refs.createDashboardModal.open();
+    },
+    _renderLoadingDashboardsMenu() {
+        return (
+            <DropdownButton bsStyle={this.props.bsStyle}
+                            bsSize="small"
+                            title={this.props.title}
+                            pullRight={this.props.pullRight}
+                            id="dashboard-selector-dropdown">
+                <MenuItem disabled>Loading dashboards...</MenuItem>
+            </DropdownButton>
         );
-      });
+    },
+    _renderDashboardMenu() {
+        let dashboards = Immutable.List();
 
-    return (
-      <DropdownButton bsStyle={this.props.bsStyle}
-                      bsSize="small"
-                      title={this.props.title}
-                      pullRight={this.props.pullRight}
-                      onSelect={this._selectDashboard}
-                      id="dashboard-selector-dropdown">
-        {dashboards}
-      </DropdownButton>
-    );
-  },
-  _renderNoDashboardsMenu() {
-    const canCreateDashboard = this.isPermitted(this.props.permissions, ['dashboards:create']);
-    let option;
-    if (canCreateDashboard) {
-      option = <MenuItem key="createDashboard">No dashboards, create one?</MenuItem>;
-    } else {
-      option = <MenuItem key="noDashboards">No dashboards available</MenuItem>;
-    }
+        this.state.dashboards
+            .sortBy(dashboard => dashboard.title)
+            .forEach((dashboard) => {
+                dashboards = dashboards.push(
+                    <MenuItem eventKey={dashboard.id} key={dashboard.id}>
+                        {dashboard.title}
+                    </MenuItem>,
+                );
+            });
 
-    return (
-      <div style={{ display: 'inline' }}>
-        <DropdownButton bsStyle={this.props.bsStyle}
-                        bsSize="small"
-                        title={this.props.title}
-                        pullRight={this.props.pullRight}
-                        onSelect={canCreateDashboard ? this._createNewDashboard : () => {}}
-                        id="no-dashboards-available-dropdown">
-          {option}
-        </DropdownButton>
-        <EditDashboardModal ref="createDashboardModal" onSaved={this._selectDashboard} />
-      </div>
-    );
-  },
-  render() {
-    let dropdownMenu;
-    if (this.state.dashboards === undefined) {
-      dropdownMenu = this._renderLoadingDashboardsMenu();
-    } else {
-      dropdownMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
-    }
+        return (
+            <DropdownButton bsStyle={this.props.bsStyle}
+                            bsSize="small"
+                            title={this.props.title}
+                            pullRight={this.props.pullRight}
+                            onSelect={this._selectDashboard}
+                            id="dashboard-selector-dropdown">
+                {dashboards}
+            </DropdownButton>
+        );
+    },
+    _renderNoDashboardsMenu() {
+        const canCreateDashboard = this.isPermitted(this.props.permissions, ['dashboards:create']);
+        let option;
+        if (canCreateDashboard) {
+            option = <MenuItem key="createDashboard">No dashboards, create one?</MenuItem>;
+        } else {
+            option = <MenuItem key="noDashboards">No dashboards available</MenuItem>;
+        }
 
-    return (
-      <div style={{ display: 'inline-block' }}>
-        <ButtonGroup>
-          {this.props.children}
-          {dropdownMenu}
-        </ButtonGroup>
-        <WidgetCreationModal ref="widgetModal"
-                             widgetType={this.props.widgetType}
-                             onConfigurationSaved={this._saveWidget}
-                             fields={this.props.fields} />
-      </div>
-    );
-  },
+        return (
+            <div style={{ display: 'inline' }}>
+                <DropdownButton bsStyle={this.props.bsStyle}
+                                bsSize="small"
+                                title={this.props.title}
+                                pullRight={this.props.pullRight}
+                                onSelect={canCreateDashboard ? this._createNewDashboard : () => {}}
+                                id="no-dashboards-available-dropdown">
+                    {option}
+                </DropdownButton>
+                <EditDashboardModal ref="createDashboardModal" onSaved={this._selectDashboard} />
+            </div>
+        );
+    },
+    render() {
+        let addToDashboardMenu;
+        if (this.state.dashboards === undefined) {
+            addToDashboardMenu = this._renderLoadingDashboardsMenu();
+        } else {
+            addToDashboardMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
+        }
+
+        const { appendMenus, children } = this.props;
+        const loading = this.state.loading;
+
+        return (
+            <div style={{ display: 'inline-block' }}>
+                <ButtonToolbar className={style.toolbar}>
+                    <ButtonGroup>
+                        {addToDashboardMenu}
+                        {appendMenus}
+                    </ButtonGroup>
+
+                    {children}
+                </ButtonToolbar>
+                <WidgetCreationModal ref="widgetModal"
+                                     widgetType={this.props.widgetType}
+                                     onConfigurationSaved={this._saveWidget}
+                                     fields={this.props.fields}
+                                     loading={loading} />
+            </div>
+        );
+    },
 });
 
-export default AddToDashboardMenuRev;
+export default AddToDashboardMenu;

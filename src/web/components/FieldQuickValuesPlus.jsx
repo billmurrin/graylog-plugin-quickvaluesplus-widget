@@ -80,7 +80,7 @@ const FieldQuickValuesPlus = React.createClass({
     },
 
     componentDidMount() {
-        ConfigurationActions.list("org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1");
+        ConfigurationActions.list("org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0");
         this.style.use();
         this._loadQuickValuesData();
     },
@@ -144,30 +144,30 @@ const FieldQuickValuesPlus = React.createClass({
             if (this.state.configuration !== undefined) {
                 this.setState({
                     quickValuesOptions: {
-                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].top_values,
-                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].sort_order,
-                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].table_size,
-                        show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].show_pie_chart,
+                        top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].top_values,
+                        sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].sort_order,
+                        table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].table_size,
+                        show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].show_pie_chart,
                         show_data_table: true,
-                        display_add_to_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_add_to_search_button,
-                        display_remove_from_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_remove_from_search_button,
-                        display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_term_hyperlinks,
-                        display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_exclude_from_query_button,
-                        display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_get_term_reply_in_new_window_button
+                        display_add_to_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_add_to_search_button,
+                        display_remove_from_search_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_remove_from_search_button,
+                        display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_term_hyperlinks,
+                        display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_exclude_from_query_button,
+                        display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_get_term_reply_in_new_window_button
                     },
                     loaded: true,
                 });
                 if (this.refs.thedash !== undefined) {
                     this.refs.thedash.refs.widgetModal.setState({
                         config: {
-                            top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].top_values,
-                            sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].sort_order,
-                            table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].table_size,
-                            show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].show_pie_chart,
+                            top_values: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].top_values,
+                            sort_order: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].sort_order,
+                            table_size: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].table_size,
+                            show_pie_chart: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].show_pie_chart,
                             show_data_table: true,
-                            display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_term_hyperlinks,
-                            display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_exclude_from_query_button,
-                            display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1'].display_get_term_reply_in_new_window_button
+                            display_term_hyperlinks: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_term_hyperlinks,
+                            display_exclude_from_query_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_exclude_from_query_button,
+                            display_get_term_reply_in_new_window_button: this.state.configuration['org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0'].display_get_term_reply_in_new_window_button
                         }
                     });
                 }

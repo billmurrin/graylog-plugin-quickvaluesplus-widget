@@ -32,7 +32,7 @@ PluginStore.register(new PluginManifest(packageJson, {
     systemConfigurations: [
         {
             component: QuickValuesPlusDefaultConfig,
-            configType: 'org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration3_1',
+            configType: 'org.graylog.plugins.quickvaluesplus.QuickValuesPlusPluginConfiguration4_0',
         },
     ],
 }));
