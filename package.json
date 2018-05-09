@@ -24,6 +24,8 @@
     "immutable": "^3.7.5"
   },
   "devDependencies": {
-    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin",
+    "webpack": "^3.11.0",
+    "webpack-cli": "^2.1.3"
   }
 }

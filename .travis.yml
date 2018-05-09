@@ -7,7 +7,7 @@ install:
   - npm install webpack -g
   - pwd
   - cd ../
-  - git clone -b "2.3.2" https://github.com/Graylog2/graylog2-server.git
+  - git clone -b "2.4.0" https://github.com/Graylog2/graylog2-server.git
   - cd graylog2-server/graylog2-web-interface
   - npm install
   - webpack --config webpack.vendor.js
