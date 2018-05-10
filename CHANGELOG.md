@@ -1,3 +1,10 @@
+## [4.0.0](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/releases/tag/4.0.0) (2018-05-09)
+* Now works properly in GL 2.4.x
+* Updated AddToDashboardMenuRev to work with GL 2.4
+* Updated QuickValuesPlusStore to provide the correct parameters to ApiRoutes.UniversalSearchApiController.fieldTerms()
+* Added Migration for version 4_0 of the QVP plugin
+* Updated version information
+
 ## [3.1.0](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/tree/3.1.0) (2018-01-12)
 * Merged #32 (@pbr0ck3r) - Add options to show/hide search buttons when creating a widget
 * Now supports the configuration of defaults for the following:

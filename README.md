@@ -5,13 +5,20 @@
 
 The QuickValuesPlus Widget is an enhancement to the original Quick Values Widget that shipped with GrayLog2. It can be added to a Stream as a Field Analyzer and to Dashboards as a widget. 
 
-Several **NEW** features have been added to version 3.1.0 (See below). Version 3.1.0 is only compatible with Graylog 2.3 (not 2.4 yet).
+Several **NEW** features have been added to version 3.1.0 and above (See below).
+
+Supported Graylog Versions
+-----------
+* Version 4.0.0 - Tested and compatible with Graylog version 2.4.x.
+* Version 3.1.0 - Tested and compatible with Graylog version 2.3.x.
+* Version 2.1.0 - Tested and compatible with Graylog versions 2.2.1 - 2.2.3.
+* Version 1.0.0 - Tested and compatible with Graylog version 2.1.3.
 
 Field Analyzer Features
 -----------
 - "Customize" menu supports modifying the Sort Order (Ascending or Descending), Table Size and number of Top Values displayed by the widget.
 - Exclude from search button - Add negated search directly to the Search Bar (E.g. !field_name:foo).
-- **New in 3.1** - Can prevent Add to Search/Remove from search buttons via global configuration.
+- **3.1/4.0** - Can prevent Add to Search/Remove from search buttons via global configuration.
 
 *Field Analyzer Features* 
 ![alt text](http://i.imgur.com/H9SRkRo.png "Field Analyzer Features")
@@ -21,7 +28,7 @@ Dashboard Features
 - Terms can be hyperlinked - drill-down into a Term search and view the results.
 - Term searches can be opened inside of a new window.
 - Can exclude a Term from the Query using a button - Negate a search term directly from the widget (*Requires dashboard edit permissions*)
-- **New in 3.1** - Term hyperlinks, Remove from query, and Open Term search in new window buttons can be hidden - very customizable!
+- **3.1/4.0** - Term hyperlinks, Remove from query, and Open Term search in new window buttons can be hidden - very customizable!
 
 *Customize your dashboards*
 ![alt text](https://i.imgur.com/GSm9Yb1.png "Dashboard customization")
@@ -29,7 +36,7 @@ Dashboard Features
 Dashboard Configuration Feature
 -----------
 - Can customize the field name used by the widget (Requires dashboard edit permissions)
-- **New in 3.1** Can now control display of term hyperlinks, remove from query, open term in new window buttons in dashboards.
+- **3.1/4.0** Can now control display of term hyperlinks, remove from query, open term in new window buttons in dashboards.
 
 Global System Configuration
 -----------
@@ -41,13 +48,6 @@ Customize the default display values in the System/Configuration page.
 - Exclude From Search Button (Dashboards)
 - Open Term Search in New Window Button (Dashboards)
 
-Supported Graylog Versions
------------
-* **Not currently compatible with Graylog 2.4.0 - *coming soon!***
-* Version 3.1.0 - Tested and compatible with Graylog version 2.3 - not currently compatible with 2.4.0.
-* Version 2.1.0 - Tested and compatible with Graylog versions 2.2.1, 2.2.2, and 2.2.3.
-* Version 1.0.0 - Tested and compatible with Graylog version 2.1.3.
- 
 Installation
 ------------
 * [Download the plugin](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/releases/)
@@ -60,10 +60,6 @@ Features and Bugs
 If you come across a bug, require further assistance, or have a great feature request, please file an [Issue](https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget/issues) providing as much detail as possible. 
 
 Contributions to the code-base are greatly appreciated!
-
-Way Ahead - Version 4.0.0
------------
-* Update codebase to work with Graylog 2.4.0
 
 Related Graylog Issues
 -----------
@@ -78,17 +74,18 @@ Development
 -----------
 You can improve your development experience for the web interface part of your plugin dramatically by making use of hot reloading. 
 
-To hot reload using Graylog 2.3, your plugin directory should be located two directories above your graylog2-web-server directory (../../) and the folder name of your plugin should be begin with graylog-plugin (More info[HERE](https://github.com/Graylog2/graylog2-server/blob/2.3/graylog2-web-interface/webpack.combined.config.js#L11))
+To hot reload using Graylog 2.4, your plugin directory should be located two directories above your graylog2-web-server directory (../../) and the folder name of your plugin should be begin with graylog-plugin (More info [HERE](https://github.com/Graylog2/graylog2-server/blob/2.3/graylog2-web-interface/webpack.combined.config.js#L11))
 
 ##### Hot-loading setup with the plugin.
 
 * Clone the Repositories
 ```
-git clone -b "2.3.2" https://github.com/Graylog2/graylog2-server.git
+git clone -b "2.4.4" https://github.com/Graylog2/graylog2-server.git
 git clone https://github.com/billmurrin/graylog-plugin-quickvaluesplus-widget.git
 ```
 
 * Install the `graylog2-web-interface` node modules and build the Vendor Manifest
+    - If you run `npm start`, it will build the Vendor Manifest for you.
 ```
 cd graylog2-server/graylog2-web-interface
 npm install
@@ -101,7 +98,7 @@ cd graylog-plugin-quickvaluesplus-widget
 npm install
 ```
 
-* From within `graylog2-web-interface`, start the web server
+* To develop the plugin with hot-reloading, start the development web server
 ```
 cd graylog2-server/graylog2-web-interface
 npm start
