@@ -3,11 +3,12 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
+before_install: if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
 install:
-  - npm install webpack -g
+  - npm install webpack@3.11.0 -g
   - pwd
   - cd ../
-  - git clone -b "2.4.0" https://github.com/Graylog2/graylog2-server.git
+  - git clone -b "2.4.4" https://github.com/Graylog2/graylog2-server.git
   - cd graylog2-server/graylog2-web-interface
   - npm install
   - webpack --config webpack.vendor.js
